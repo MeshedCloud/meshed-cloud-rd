@@ -4,7 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.meshed.cloud.rd.domain.cli.utils.GenerateUtils;
 import cn.meshed.cloud.rd.project.enums.ServiceTypeEnum;
 import cn.meshed.cloud.utils.AssertUtils;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -62,6 +64,7 @@ public class ServiceGroup implements Serializable {
     /**
      * 模型分组所属项目key
      */
+    @Setter(AccessLevel.NONE)
     private String projectKey;
 
     /**
@@ -78,6 +81,11 @@ public class ServiceGroup implements Serializable {
      * 服务列表
      */
     private Set<Service> services;
+
+    public void setProjectKey(String projectKey) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目唯一标识不能为空");
+        this.projectKey = StringUtils.upperCase(projectKey);
+    }
 
     public void initServiceGroup(String groupKey, String basePackage) {
         this.className = StrUtil.upperFirst(groupKey) + this.type.getKey();

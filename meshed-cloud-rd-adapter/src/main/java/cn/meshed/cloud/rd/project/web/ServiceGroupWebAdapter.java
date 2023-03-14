@@ -4,6 +4,7 @@ import cn.meshed.cloud.rd.domain.project.ability.ServiceGroupAbility;
 import cn.meshed.cloud.rd.project.ServiceGroupAdapter;
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
 import cn.meshed.cloud.rd.project.data.ServiceGroupDTO;
+import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
 import cn.meshed.cloud.rd.project.query.ServiceByClassNameQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h1></h1>
@@ -33,7 +35,7 @@ public class ServiceGroupWebAdapter implements ServiceGroupAdapter {
      * @return {@link SingleResponse< List <ServiceGroupDTO>>}
      */
     @Override
-    public SingleResponse<List<ServiceGroupDTO>> select(String projectKey) {
+    public SingleResponse<Set<ServiceGroupSelectDTO>> select(String projectKey) {
         return serviceGroupAbility.select(projectKey);
     }
 

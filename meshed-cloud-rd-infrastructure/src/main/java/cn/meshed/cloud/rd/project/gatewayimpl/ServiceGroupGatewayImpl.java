@@ -74,6 +74,19 @@ public class ServiceGroupGatewayImpl implements ServiceGroupGateway {
     }
 
     /**
+     * <h1>分页搜索</h1>
+     *
+     * @param uuids
+     * @return {@link List<ServiceGroup>}
+     */
+    @Override
+    public List<ServiceGroup> searchList(Set<String> uuids) {
+        LambdaQueryWrapper<ServiceGroupDO> lqw = new LambdaQueryWrapper<>();
+        lqw.in(ServiceGroupDO::getUuid, uuids);
+        return CopyUtils.copyListProperties(serviceGroupMapper.selectList(lqw), ServiceGroup::new);
+    }
+
+    /**
      * 查询
      *
      * @param uuid 参数
@@ -147,8 +160,8 @@ public class ServiceGroupGatewayImpl implements ServiceGroupGateway {
 
     private Set<String> waitPublishGroupList(String projectKey) {
         LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
-        lqw.select(ServiceDO::getGroupId);
-        lqw.eq(ServiceDO::getProjectKey, projectKey)
+        lqw.select(ServiceDO::getGroupId)
+                .eq(ServiceDO::getProjectKey, projectKey)
                 .eq(ServiceDO::getReleaseStatus, ReleaseStatusEnum.PROCESSING);
         List<ServiceDO> serviceList = serviceMapper.selectList(lqw);
         if (CollectionUtils.isEmpty(serviceList)) {

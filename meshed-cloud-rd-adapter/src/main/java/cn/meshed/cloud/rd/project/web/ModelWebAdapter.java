@@ -6,12 +6,10 @@ import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
 import cn.meshed.cloud.rd.project.query.ModelByEnnameQry;
-import cn.meshed.cloud.rd.project.query.ModelByOneQry;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +35,7 @@ public class ModelWebAdapter implements ModelAdapter {
      * @return {@link PageResponse<ModelDTO>}
      */
     @Override
-    public PageResponse<ModelDTO> list(@ApiParam("项目key") String projectKey, @Valid ModelPageQry modelPageQry) {
+    public PageResponse<ModelDTO> list(String projectKey, @Valid ModelPageQry modelPageQry) {
         modelPageQry.setProjectKey(projectKey);
         return modelAbility.list(modelPageQry);
     }
@@ -45,14 +43,12 @@ public class ModelWebAdapter implements ModelAdapter {
     /**
      * 详情
      *
-     * @param uuid          uuid
-     * @param modelByOneQry
+     * @param uuid uuid
      * @return {@link SingleResponse<ModelDetailDTO>}
      */
     @Override
-    public SingleResponse<ModelDetailDTO> details(String uuid, @Valid ModelByOneQry modelByOneQry) {
-        modelByOneQry.setUuid(uuid);
-        return modelAbility.details(modelByOneQry);
+    public SingleResponse<ModelDetailDTO> details(String uuid) {
+        return modelAbility.details(uuid);
     }
 
     /**

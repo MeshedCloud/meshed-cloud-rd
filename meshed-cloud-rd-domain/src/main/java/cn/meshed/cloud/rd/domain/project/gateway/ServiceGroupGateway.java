@@ -1,10 +1,12 @@
 package cn.meshed.cloud.rd.domain.project.gateway;
 
+import cn.meshed.cloud.core.IList;
 import cn.meshed.cloud.core.IQuery;
 import cn.meshed.cloud.core.ISave;
 import cn.meshed.cloud.core.ISelect;
 import cn.meshed.cloud.rd.domain.project.ServiceGroup;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,7 +16,7 @@ import java.util.Set;
  * @version 1.0
  */
 public interface ServiceGroupGateway extends ISave<ServiceGroup, ServiceGroup>, ISelect<String, Set<ServiceGroup>>,
-        IQuery<String, ServiceGroup> {
+        IQuery<String, ServiceGroup>, IList<Set<String>, List<ServiceGroup>> {
 
     /**
      * 判断分组类名是否已经存在

@@ -2,11 +2,13 @@ package cn.meshed.cloud.rd.domain.project.ability;
 
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
 import cn.meshed.cloud.rd.project.data.ServiceGroupDTO;
+import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
 import cn.meshed.cloud.rd.project.query.ServiceByClassNameQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h1></h1>
@@ -22,7 +24,7 @@ public interface ServiceGroupAbility {
      * @param projectKey 项目key
      * @return {@link SingleResponse<List<ServiceGroupDTO>>}
      */
-    SingleResponse<List<ServiceGroupDTO>> select(String projectKey);
+    SingleResponse<Set<ServiceGroupSelectDTO>> select(String projectKey);
 
     /**
      * 保存功能

@@ -5,9 +5,8 @@ import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
 import cn.meshed.cloud.rd.project.executor.command.ModelCmdExe;
-import cn.meshed.cloud.rd.project.executor.query.ModelByOneQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ModelByUuidQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ModelPageQryExe;
-import cn.meshed.cloud.rd.project.query.ModelByOneQry;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class ModelAbilityImpl implements ModelAbility {
 
     private final ModelPageQryExe modelPageQryExe;
-    private final ModelByOneQryExe modelByOneQryExe;
+    private final ModelByUuidQryExe modelByUuidQryExe;
     private final ModelCmdExe modelCmdExe;
 
     /**
@@ -43,12 +42,12 @@ public class ModelAbilityImpl implements ModelAbility {
     /**
      * 详情
      *
-     * @param modelByOneQry
+     * @param uuid
      * @return {@link SingleResponse < ModelDetailDTO >}
      */
     @Override
-    public SingleResponse<ModelDetailDTO> details(ModelByOneQry modelByOneQry) {
-        return modelByOneQryExe.execute(modelByOneQry);
+    public SingleResponse<ModelDetailDTO> details(String uuid) {
+        return modelByUuidQryExe.execute(uuid);
     }
 
     /**

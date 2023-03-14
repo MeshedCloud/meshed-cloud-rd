@@ -6,10 +6,9 @@ import cn.meshed.cloud.rd.project.data.ServiceDTO;
 import cn.meshed.cloud.rd.project.data.ServiceDetailDTO;
 import cn.meshed.cloud.rd.project.data.ServiceReleaseCountDTO;
 import cn.meshed.cloud.rd.project.executor.command.ServiceCmdExe;
-import cn.meshed.cloud.rd.project.executor.query.ServiceByOneQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ServiceByUuidQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServicePageQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceReleaseCountQryExe;
-import cn.meshed.cloud.rd.project.query.ServiceByOneQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -28,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class ServiceAbilityImpl implements ServiceAbility {
 
     private final ServicePageQryExe servicePageQryExe;
-    private final ServiceByOneQryExe serviceByOneQryExe;
+    private final ServiceByUuidQryExe serviceByUuidQryExe;
     private final ServiceCmdExe serviceCmdExe;
     private final ServiceReleaseCountQryExe serviceReleaseCountQryExe;
 
@@ -46,12 +45,12 @@ public class ServiceAbilityImpl implements ServiceAbility {
     /**
      * 详情
      *
-     * @param serviceByOneQry
+     * @param uuid
      * @return {@link SingleResponse < ServiceDetailDTO >}
      */
     @Override
-    public SingleResponse<ServiceDetailDTO> details(ServiceByOneQry serviceByOneQry) {
-        return serviceByOneQryExe.execute(serviceByOneQry);
+    public SingleResponse<ServiceDetailDTO> details(String uuid) {
+        return serviceByUuidQryExe.execute(uuid);
     }
 
     /**

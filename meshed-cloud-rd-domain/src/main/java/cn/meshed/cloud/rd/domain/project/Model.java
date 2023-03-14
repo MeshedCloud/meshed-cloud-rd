@@ -7,10 +7,12 @@ import cn.meshed.cloud.rd.project.enums.ModelTypeEnum;
 import cn.meshed.cloud.rd.project.enums.ProjectAccessModeEnum;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.enums.ServiceModelStatusEnum;
+import cn.meshed.cloud.utils.AssertUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -108,7 +110,8 @@ public class Model implements Serializable {
     private Set<Field> fields;
 
     public void setProjectKey(String projectKey) {
-        this.projectKey = projectKey.toUpperCase();
+        AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目唯一标识不能为空");
+        this.projectKey = StringUtils.upperCase(projectKey);
     }
 
     public void initModel(Project project, String classNamePrefix) {

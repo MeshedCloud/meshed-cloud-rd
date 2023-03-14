@@ -4,8 +4,12 @@ import cn.meshed.cloud.context.SecurityContext;
 import cn.meshed.cloud.rd.project.enums.ProjectAccessModeEnum;
 import cn.meshed.cloud.rd.project.enums.ProjectStatusEnum;
 import cn.meshed.cloud.rd.project.enums.ProjectTypeEnum;
+import cn.meshed.cloud.utils.AssertUtils;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -43,6 +47,7 @@ public class Project implements Serializable {
     /**
      * 项目key
      */
+    @Setter(AccessLevel.NONE)
     private String key;
 
     /**
@@ -84,6 +89,11 @@ public class Project implements Serializable {
      * 项目状态
      */
     private ProjectStatusEnum status;
+
+    public void setKey(String key) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(key), "项目唯一标识不能为空");
+        this.key = StringUtils.upperCase(key);
+    }
 
     public void initProject() {
         this.basePackage = buildBasePackageName();

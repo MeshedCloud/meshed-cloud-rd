@@ -70,7 +70,3 @@ dubbo:
     retries: 2
   reference:
     check: false
-
-mybatis-plus:
-  configuration:
-    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler

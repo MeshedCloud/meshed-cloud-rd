@@ -1,12 +1,18 @@
 package cn.meshed.cloud.rd.project.gatewayimpl;
 
+import cn.meshed.cloud.context.SecurityContext;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
+import cn.meshed.cloud.rd.project.enums.ProjectVisitTypeEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ProjectDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ProjectMapper;
+import cn.meshed.cloud.rd.project.query.ProjectPageQry;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.CopyUtils;
+import cn.meshed.cloud.utils.PageUtils;
+import com.alibaba.cola.dto.PageResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -67,4 +73,43 @@ public class ProjectGatewayImpl implements ProjectGateway {
     }
 
 
+    /**
+     * <h1>分页搜索</h1>
+     *
+     * @param pageQry 项目分页查询参数
+     * @return {@link PageResponse<Project>}
+     */
+    @Override
+    public PageResponse<Project> searchPageList(ProjectPageQry pageQry) {
+        Page<Object> page = PageUtils.startPage(pageQry);
+        LambdaQueryWrapper<ProjectDO> lqw = new LambdaQueryWrapper<>();
+        lqw.like(StringUtils.isNotBlank(pageQry.getKeyword()), ProjectDO::getName, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ProjectDO::getDescription, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ProjectDO::getKey, pageQry.getKeyword())
+                .eq(pageQry.getType() != null, ProjectDO::getType, pageQry.getType())
+                .eq(pageQry.getAccessMode() != null, ProjectDO::getAccessMode, pageQry.getAccessMode());
+
+        if (pageQry.getVisitType() != null) {
+            handleVisitType(lqw, pageQry);
+        }
+
+        return PageUtils.of(projectMapper.selectList(lqw), page, Project::new);
+    }
+
+    /**
+     * 访问
+     *
+     * @param lqw     查询条件
+     * @param pageQry 查询分页
+     */
+    private void handleVisitType(LambdaQueryWrapper<ProjectDO> lqw, ProjectPageQry pageQry) {
+        ProjectVisitTypeEnum visitType = pageQry.getVisitType();
+        if (ProjectVisitTypeEnum.LATELY == visitType) {
+            //查询最近仓库
+        } else if (ProjectVisitTypeEnum.MEMBER == visitType) {
+            //todo 查询成员仓库
+        } else if (ProjectVisitTypeEnum.OWNER == visitType) {
+            lqw.eq(ProjectDO::getOwnerId, SecurityContext.getOperatorUserId());
+        }
+    }
 }

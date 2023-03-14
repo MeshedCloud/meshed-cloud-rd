@@ -58,7 +58,13 @@ public class Service implements Serializable {
     /**
      * 模型分组所属项目key
      */
+    @Setter(AccessLevel.NONE)
     private String projectKey;
+
+    /**
+     * 所属分组的类名
+     */
+    private String className;
 
     /**
      * 服务名称
@@ -138,6 +144,11 @@ public class Service implements Serializable {
     public void setMethod(String method) {
         AssertUtils.isTrue(StringUtils.isNotBlank(method), "方法不能为空");
         this.method = StrUtil.lowerFirst(method);
+    }
+
+    public void setProjectKey(String projectKey) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目唯一标识不能为空");
+        this.projectKey = StringUtils.upperCase(projectKey);
     }
 
     public void initService(ServiceGroup serviceGroup) {

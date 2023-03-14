@@ -7,6 +7,8 @@ import cn.meshed.cloud.rd.project.data.ProjectDTO;
 import cn.meshed.cloud.rd.project.data.ProjectDetailDTO;
 import cn.meshed.cloud.rd.project.executor.command.ProjectCmdExe;
 import cn.meshed.cloud.rd.project.executor.query.ProjectByKeyQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ProjectExistKeyQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ProjectPageQryExe;
 import cn.meshed.cloud.rd.project.query.ProjectPageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -26,6 +28,8 @@ public class ProjectAbilityImpl implements ProjectAbility {
 
     private final ProjectCmdExe projectCmdExe;
     private final ProjectByKeyQryExe projectByKeyQryExe;
+    private final ProjectPageQryExe projectPageQryExe;
+    private final ProjectExistKeyQryExe projectExistKeyQryExe;
 
     /**
      * 列表
@@ -35,7 +39,7 @@ public class ProjectAbilityImpl implements ProjectAbility {
      */
     @Override
     public PageResponse<ProjectDTO> list(ProjectPageQry projectPageQry) {
-        return null;
+        return projectPageQryExe.execute(projectPageQry);
     }
 
     /**
@@ -69,5 +73,16 @@ public class ProjectAbilityImpl implements ProjectAbility {
     @Override
     public Response change(ProjectChangeCmd projectChangeCmd) {
         return null;
+    }
+
+    /**
+     * 判断项目唯一标识是否存在
+     *
+     * @param key 项目唯一标识
+     * @return 结果
+     */
+    @Override
+    public Response checkKey(String key) {
+        return projectExistKeyQryExe.execute(key);
     }
 }

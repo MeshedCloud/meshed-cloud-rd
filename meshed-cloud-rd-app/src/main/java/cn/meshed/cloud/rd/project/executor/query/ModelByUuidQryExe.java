@@ -3,10 +3,9 @@ package cn.meshed.cloud.rd.project.executor.query;
 import cn.meshed.cloud.cqrs.QueryExecute;
 import cn.meshed.cloud.rd.domain.project.Model;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
-import cn.meshed.cloud.rd.project.data.ModelDTO;
-import cn.meshed.cloud.rd.project.query.ModelPageQry;
+import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
 import cn.meshed.cloud.utils.ResultUtils;
-import com.alibaba.cola.dto.PageResponse;
+import com.alibaba.cola.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,17 +17,17 @@ import org.springframework.stereotype.Component;
  */
 @RequiredArgsConstructor
 @Component
-public class ModelPageQryExe implements QueryExecute<ModelPageQry, PageResponse<ModelDTO>> {
+public class ModelByUuidQryExe implements QueryExecute<String, SingleResponse<ModelDetailDTO>> {
 
     private final ModelGateway modelGateway;
 
     /**
-     * @param modelPageQry
+     * @param uuid
      * @return
      */
     @Override
-    public PageResponse<ModelDTO> execute(ModelPageQry modelPageQry) {
-        PageResponse<Model> pageResponse = modelGateway.searchPageList(modelPageQry);
-        return ResultUtils.copyPage(pageResponse, ModelDTO::new);
+    public SingleResponse<ModelDetailDTO> execute(String uuid) {
+        Model model = modelGateway.query(uuid);
+        return ResultUtils.copy(model, ModelDetailDTO.class);
     }
 }

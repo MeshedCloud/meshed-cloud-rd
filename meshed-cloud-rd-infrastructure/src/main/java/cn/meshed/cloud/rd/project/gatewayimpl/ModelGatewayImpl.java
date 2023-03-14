@@ -12,8 +12,10 @@ import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ModelMapper;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.CopyUtils;
+import cn.meshed.cloud.utils.PageUtils;
 import com.alibaba.cola.dto.PageResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,12 +47,18 @@ public class ModelGatewayImpl implements ModelGateway {
 
 
     /**
-     * @param modelPageQry
-     * @return
+     * @param pageQry 分页参数
+     * @return {@link PageResponse<Model>}
      */
     @Override
-    public PageResponse<Model> searchPageList(ModelPageQry modelPageQry) {
-        return null;
+    public PageResponse<Model> searchPageList(ModelPageQry pageQry) {
+        Page<Object> page = PageUtils.startPage(pageQry);
+        LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
+        lqw.like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getName, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getDescription, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getClassName, pageQry.getKeyword())
+                .eq(pageQry.getType() != null, ModelDO::getType, pageQry.getType());
+        return PageUtils.of(modelMapper.selectList(lqw), page, Model::new);
     }
 
     /**

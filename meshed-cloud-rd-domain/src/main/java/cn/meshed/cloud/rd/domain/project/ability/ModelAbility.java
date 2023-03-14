@@ -3,7 +3,6 @@ package cn.meshed.cloud.rd.domain.project.ability;
 import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
-import cn.meshed.cloud.rd.project.query.ModelByOneQry;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -30,7 +29,7 @@ public interface ModelAbility {
      *
      * @return {@link SingleResponse < ModelDetailDTO >}
      */
-    SingleResponse<ModelDetailDTO> details(ModelByOneQry modelByOneQry);
+    SingleResponse<ModelDetailDTO> details(String uuid);
 
     /**
      * 保存功能

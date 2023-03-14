@@ -10,13 +10,18 @@ import cn.meshed.cloud.rd.project.convertor.ServiceConvertor;
 import cn.meshed.cloud.rd.project.enums.RequestModeEnum;
 import cn.meshed.cloud.rd.project.enums.ServiceTypeEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceDO;
+import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceGroupDO;
+import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceGroupMapper;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceMapper;
+import cn.meshed.cloud.rd.project.query.ServiceGroupQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.CopyUtils;
+import cn.meshed.cloud.utils.PageUtils;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.exception.SysException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +48,7 @@ import static cn.meshed.cloud.rd.domain.common.constant.Constant.BASE_JAVA_TYPES
 public class ServiceGatewayImpl implements ServiceGateway {
 
     private final ServiceMapper serviceMapper;
+    private final ServiceGroupMapper serviceGroupMapper;
     private final ModelGateway modelGateway;
     private final FieldGateway fieldGateway;
     private final List<RelevanceTypeEnum> groupTypes = new ArrayList<RelevanceTypeEnum>(2) {{
@@ -54,12 +60,56 @@ public class ServiceGatewayImpl implements ServiceGateway {
     /**
      * <h1>分页搜索</h1>
      *
-     * @param param@return {@link PageResponse<Service>}
+     * @param pageQry
+     * @return {@link PageResponse<Service>}
      */
     @Override
-    public PageResponse<Service> searchPageList(ServicePageQry param) {
-        return null;
+    public PageResponse<Service> searchPageList(ServicePageQry pageQry) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(pageQry.getProjectKey()), "项目唯一标识不能为空");
+        //获取项目内和指定类型的分组ID，作为服务的限定范围
+        Set<String> groupIds = getGroupIds(pageQry);
+        //不存在分组ID说明项目内不存在服务或者不存在限定条件的服务
+        if (CollectionUtils.isEmpty(groupIds)) {
+            return PageResponse.of(pageQry.getPageSize(), pageQry.getPageIndex());
+        }
+        Page<Object> page = PageUtils.startPage(pageQry);
+        LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
+        lqw.in(ServiceDO::getGroupId, groupIds)
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getName, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getDescription, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getMethod, pageQry.getKeyword())
+                .eq(pageQry.getAccessMode() != null, ServiceDO::getAccessMode, pageQry.getAccessMode());
+        return PageUtils.of(serviceMapper.selectList(lqw), page, Service::new);
     }
+
+    private Set<String> getGroupIds(ServicePageQry pageQry) {
+        ServiceGroupQry serviceGroupQry = new ServiceGroupQry();
+        serviceGroupQry.setDomain(pageQry.getDomain());
+        serviceGroupQry.setProjectKey(pageQry.getProjectKey());
+        serviceGroupQry.setType(pageQry.getType());
+        return getGroupIdList(serviceGroupQry);
+    }
+
+    /**
+     * 根据条件分组ID列表
+     *
+     * @param serviceGroupQry 项目key
+     * @return 详情列表
+     */
+    public Set<String> getGroupIdList(ServiceGroupQry serviceGroupQry) {
+        LambdaQueryWrapper<ServiceGroupDO> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(StringUtils.isNotBlank(serviceGroupQry.getProjectKey()),
+                ServiceGroupDO::getProjectKey, StringUtils.upperCase(serviceGroupQry.getProjectKey()));
+        lqw.eq(StringUtils.isNotBlank(serviceGroupQry.getDomain()),
+                ServiceGroupDO::getDomainKey, StringUtils.upperCase(serviceGroupQry.getDomain()));
+        lqw.eq(serviceGroupQry.getType() != null, ServiceGroupDO::getType, serviceGroupQry.getType());
+        List<ServiceGroupDO> serviceGroupList = serviceGroupMapper.selectList(lqw);
+        if (CollectionUtils.isEmpty(serviceGroupList)) {
+            return Collections.emptySet();
+        }
+        return serviceGroupList.stream().map(ServiceGroupDO::getUuid).collect(Collectors.toSet());
+    }
+
 
     /**
      * 查询

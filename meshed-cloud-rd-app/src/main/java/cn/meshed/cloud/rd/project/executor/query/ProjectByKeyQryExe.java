@@ -1,6 +1,8 @@
 package cn.meshed.cloud.rd.project.executor.query;
 
 import cn.meshed.cloud.cqrs.QueryExecute;
+import cn.meshed.cloud.rd.domain.project.Project;
+import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
 import cn.meshed.cloud.rd.project.data.ProjectDetailDTO;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.SingleResponse;
@@ -16,12 +18,19 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class ProjectByKeyQryExe implements QueryExecute<String, SingleResponse<ProjectDetailDTO>> {
+
+    private final ProjectGateway projectGateway;
+
     /**
      * @param projectKey
      * @return
      */
     @Override
     public SingleResponse<ProjectDetailDTO> execute(String projectKey) {
-        return ResultUtils.ok();
+        Project project = projectGateway.queryByKey(projectKey);
+        if (project == null) {
+            return ResultUtils.fail("项目不存在");
+        }
+        return ResultUtils.copy(project, ProjectDetailDTO.class);
     }
 }

@@ -7,7 +7,6 @@ import cn.meshed.cloud.rd.project.data.ServiceDTO;
 import cn.meshed.cloud.rd.project.data.ServiceDetailDTO;
 import cn.meshed.cloud.rd.project.data.ServiceReleaseCountDTO;
 import cn.meshed.cloud.rd.project.query.ServiceByMethodQry;
-import cn.meshed.cloud.rd.project.query.ServiceByOneQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -45,14 +44,12 @@ public class ServiceWebAdapter implements ServiceAdapter {
     /**
      * 详情
      *
-     * @param uuid            服务uuid
-     * @param serviceByOneQry
+     * @param uuid 服务uuid
      * @return {@link SingleResponse<ServiceDetailDTO>}
      */
     @Override
-    public SingleResponse<ServiceDetailDTO> details(String uuid, @Valid ServiceByOneQry serviceByOneQry) {
-        serviceByOneQry.setUuid(uuid);
-        return serviceAbility.details(serviceByOneQry);
+    public SingleResponse<ServiceDetailDTO> details(String uuid) {
+        return serviceAbility.details(uuid);
     }
 
     /**
