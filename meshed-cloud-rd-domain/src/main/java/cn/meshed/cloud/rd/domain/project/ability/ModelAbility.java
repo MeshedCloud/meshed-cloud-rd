@@ -3,15 +3,10 @@ package cn.meshed.cloud.rd.domain.project.ability;
 import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
-import cn.meshed.cloud.rd.project.query.ModelAvailableKeyQry;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <h1>模型能力</h1>
@@ -43,20 +38,4 @@ public interface ModelAbility {
      * @return {@link Response}
      */
     Response save(ModelCmd modelCmd);
-
-    /**
-     * 可用模型唯一标识
-     *
-     * @param modelAvailableKeyQry 模型唯一标识参数
-     * @return 是否可用
-     */
-    Response availableKey(@Valid ModelAvailableKeyQry modelAvailableKeyQry);
-
-    /**
-     * 模型选项
-     *
-     * @param projectKey 项目唯一标识
-     * @return {@link SingleResponse< List <String>>}
-     */
-    SingleResponse<Set<String>> select(String projectKey);
 }

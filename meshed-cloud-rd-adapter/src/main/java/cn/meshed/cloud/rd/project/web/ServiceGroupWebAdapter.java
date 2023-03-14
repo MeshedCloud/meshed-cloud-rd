@@ -5,7 +5,7 @@ import cn.meshed.cloud.rd.project.ServiceGroupAdapter;
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
 import cn.meshed.cloud.rd.project.data.ServiceGroupDTO;
 import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
-import cn.meshed.cloud.rd.project.query.ServiceAvailableClassQry;
+import cn.meshed.cloud.rd.project.query.ServiceByClassNameQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
@@ -51,14 +51,13 @@ public class ServiceGroupWebAdapter implements ServiceGroupAdapter {
     }
 
     /**
-     * 检查类名是否可用（控制器中唯一性）
+     * 检查方法是否可用（控制器中唯一性）
      *
-     * @param serviceAvailableClassQry 检查参数
+     * @param serviceByClassNameQry 检查参数
      * @return {@link Response}
      */
     @Override
-    public Response availableClassName(@Valid ServiceAvailableClassQry serviceAvailableClassQry) {
-        return serviceGroupAbility.availableClassName(serviceAvailableClassQry);
+    public Response checkClassName(@Valid ServiceByClassNameQry serviceByClassNameQry) {
+        return serviceGroupAbility.checkClassName(serviceByClassNameQry);
     }
-
 }

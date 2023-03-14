@@ -85,7 +85,7 @@ public class Service implements Serializable {
     /**
      * 服务版本号
      */
-    private Long version;
+    private String version;
 
     /**
      * 服务负责人ID
@@ -151,14 +151,13 @@ public class Service implements Serializable {
         this.projectKey = StringUtils.upperCase(projectKey);
     }
 
-    public void initService() {
+    public void initService(ServiceGroup serviceGroup) {
         this.releaseStatus = ReleaseStatusEnum.EDIT;
         this.status = ServiceModelStatusEnum.DEV;
         this.version = INIT_VERSION;
         this.ownerId = SecurityContext.getOperatorUserId();
         if (ServiceTypeEnum.RPC == this.type) {
-            this.uri = this.method;
-            this.requestType = RequestTypeEnum.RPC;
+            this.uri = String.format("%s#%s", serviceGroup.getClassName(), this.method);
         }
     }
 
@@ -198,6 +197,7 @@ public class Service implements Serializable {
         String name = this.name + "请求参数";
         //其他模式均需要合并，路径参数依旧支持独立（合并中依旧包含路径参数）
         Model model = buildBaseModel(requests, name);
+
         if (RequestModeEnum.PAGE == this.requestMode) {
             model.setType(getModelTypeEnum(RequestModeEnum.PAGE.name()));
             model.setSuperClass(PAGE_QUERY);
@@ -205,10 +205,7 @@ public class Service implements Serializable {
             model.setType(getModelTypeEnum("REQUEST"));
             model.setSuperClass(DTO);
         }
-        String classNamePrefix = StrUtil.upperFirst(
-                this.className.replaceAll(this.type.getKey(), "")
-        );
-        model.initModel(classNamePrefix + StrUtil.upperFirst(this.method));
+        model.initModel(this.method);
 
         Set<Field> fields = requests.stream().filter(Objects::nonNull)
                 .filter(field -> field.getGeneric() == BaseGenericsEnum.PATH_VARIABLE).collect(Collectors.toSet());
@@ -270,10 +267,7 @@ public class Service implements Serializable {
         Model model = buildBaseModel(responses, name);
         model.setType(getModelTypeEnum("RESPONSE"));
         model.setSuperClass(DTO);
-        String classNamePrefix = StrUtil.upperFirst(
-                this.className.replaceAll(this.type.getKey(), "")
-        );
-        model.initModel(classNamePrefix + StrUtil.upperFirst(this.method));
+        model.initModel(this.method);
         //组装成字段
         Field field = buildBaseField(name, model.getClassName());
         field.setGeneric(BaseGenericsEnum.NONE);

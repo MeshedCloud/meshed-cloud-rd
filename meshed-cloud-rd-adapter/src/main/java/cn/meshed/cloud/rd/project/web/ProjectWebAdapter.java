@@ -84,8 +84,7 @@ public class ProjectWebAdapter implements ProjectAdapter {
      * @return {@link Response}
      */
     @Override
-    public Response availableKey(String key) {
-        return projectAbility.availableKey(key);
+    public Response checkKey(String key) {
+        return projectAbility.checkKey(key);
     }
-
 }

@@ -4,9 +4,9 @@ import cn.meshed.cloud.rd.domain.project.ability.ServiceGroupAbility;
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
 import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
 import cn.meshed.cloud.rd.project.executor.command.ServiceGroupCmdExe;
-import cn.meshed.cloud.rd.project.executor.query.ServiceGroupAvailableClassQryExe;
-import cn.meshed.cloud.rd.project.executor.query.ServiceGroupBySelectQryExe;
-import cn.meshed.cloud.rd.project.query.ServiceAvailableClassQry;
+import cn.meshed.cloud.rd.project.executor.query.ServiceByClassNameQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ServiceBySelectQryExe;
+import cn.meshed.cloud.rd.project.query.ServiceByClassNameQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +25,8 @@ import java.util.Set;
 public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
 
     private final ServiceGroupCmdExe serviceGroupCmdExe;
-    private final ServiceGroupAvailableClassQryExe serviceGroupAvailableClassQryExe;
-    private final ServiceGroupBySelectQryExe serviceGroupBySelectQryExe;
+    private final ServiceByClassNameQryExe serviceByClassNameQryExe;
+    private final ServiceBySelectQryExe serviceBySelectQryExe;
 
     /**
      * 服务分组选择获取
@@ -36,7 +36,7 @@ public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
      */
     @Override
     public SingleResponse<Set<ServiceGroupSelectDTO>> select(String projectKey) {
-        return serviceGroupBySelectQryExe.execute(projectKey);
+        return serviceBySelectQryExe.execute(projectKey);
     }
 
     /**
@@ -53,11 +53,11 @@ public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
     /**
      * 检查方法是否可用（控制器中唯一性）
      *
-     * @param serviceAvailableClassQry 检查参数
+     * @param serviceByClassNameQry 检查参数
      * @return {@link Response}
      */
     @Override
-    public Response availableClassName(ServiceAvailableClassQry serviceAvailableClassQry) {
-        return serviceGroupAvailableClassQryExe.execute(serviceAvailableClassQry);
+    public Response checkClassName(ServiceByClassNameQry serviceByClassNameQry) {
+        return serviceByClassNameQryExe.execute(serviceByClassNameQry);
     }
 }

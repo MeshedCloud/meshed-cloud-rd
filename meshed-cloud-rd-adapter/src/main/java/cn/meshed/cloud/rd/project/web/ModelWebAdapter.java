@@ -5,8 +5,7 @@ import cn.meshed.cloud.rd.project.ModelAdapter;
 import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
-import cn.meshed.cloud.rd.project.data.ModelReleaseCountDTO;
-import cn.meshed.cloud.rd.project.query.ModelAvailableKeyQry;
+import cn.meshed.cloud.rd.project.query.ModelByEnnameQry;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <h1>模型Web适配器</h1>
@@ -68,32 +65,11 @@ public class ModelWebAdapter implements ModelAdapter {
     /**
      * 检查英文名是否合法
      *
-     * @param modelAvailableKeyQry 检查参数
+     * @param modelByEnnameQry 检查参数
      * @return {@link Response}
      */
     @Override
-    public Response availableKey(@Valid ModelAvailableKeyQry modelAvailableKeyQry) {
-        return modelAbility.availableKey(modelAvailableKeyQry);
+    public Response checkEnname(@Valid ModelByEnnameQry modelByEnnameQry) {
+        return null;
     }
-
-    /**
-     * 模型选项
-     *
-     * @param projectKey 项目唯一标识
-     * @return {@link SingleResponse< List <String>>}
-     */
-    @Override
-    public SingleResponse<Set<String>> select(String projectKey) {
-        return modelAbility.select(projectKey);
-    }
-
-    /**
-     * @param s
-     * @return
-     */
-    @Override
-    public SingleResponse<ModelReleaseCountDTO> releaseCount(String s) {
-        return SingleResponse.buildSuccess();
-    }
-
 }

@@ -3,7 +3,7 @@ package cn.meshed.cloud.rd.domain.project.ability;
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
 import cn.meshed.cloud.rd.project.data.ServiceGroupDTO;
 import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
-import cn.meshed.cloud.rd.project.query.ServiceAvailableClassQry;
+import cn.meshed.cloud.rd.project.query.ServiceByClassNameQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
 
@@ -37,8 +37,8 @@ public interface ServiceGroupAbility {
     /**
      * 检查方法是否可用（控制器中唯一性）
      *
-     * @param serviceAvailableClassQry 检查参数
+     * @param serviceByClassNameQry 检查参数
      * @return {@link Response}
      */
-    Response availableClassName(ServiceAvailableClassQry serviceAvailableClassQry);
+    Response checkClassName(ServiceByClassNameQry serviceByClassNameQry);
 }

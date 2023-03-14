@@ -56,5 +56,5 @@ public interface ProjectAbility {
      * @param key 项目唯一标识
      * @return 结果
      */
-    Response availableKey(String key);
+    Response checkKey(String key);
 }

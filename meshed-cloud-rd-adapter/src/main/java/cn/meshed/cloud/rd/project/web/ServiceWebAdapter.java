@@ -6,7 +6,7 @@ import cn.meshed.cloud.rd.project.command.ServiceCmd;
 import cn.meshed.cloud.rd.project.data.ServiceDTO;
 import cn.meshed.cloud.rd.project.data.ServiceDetailDTO;
 import cn.meshed.cloud.rd.project.data.ServiceReleaseCountDTO;
-import cn.meshed.cloud.rd.project.query.ServiceAvailableMethodQry;
+import cn.meshed.cloud.rd.project.query.ServiceByMethodQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -77,12 +77,11 @@ public class ServiceWebAdapter implements ServiceAdapter {
     /**
      * 检查方法是否可用（控制器中唯一性）
      *
-     * @param serviceAvailableMethodQry 检查参数
+     * @param serviceByMethodQry 检查参数
      * @return {@link Response}
      */
     @Override
-    public Response availableMethodName(@Valid ServiceAvailableMethodQry serviceAvailableMethodQry) {
-        return serviceAbility.availableMethodName(serviceAvailableMethodQry);
+    public Response checkMethod(@Valid ServiceByMethodQry serviceByMethodQry) {
+        return null;
     }
-
 }

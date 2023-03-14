@@ -2,7 +2,6 @@ package cn.meshed.cloud.rd.project.gatewayimpl;
 
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Service;
-import cn.meshed.cloud.rd.domain.project.ServiceItem;
 import cn.meshed.cloud.rd.domain.project.constant.RelevanceTypeEnum;
 import cn.meshed.cloud.rd.domain.project.gateway.FieldGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
@@ -14,7 +13,6 @@ import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceGroupDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceGroupMapper;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceMapper;
-import cn.meshed.cloud.rd.project.gatewayimpl.database.vo.ServiceVO;
 import cn.meshed.cloud.rd.project.query.ServiceGroupQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import cn.meshed.cloud.utils.AssertUtils;
@@ -30,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,10 @@ public class ServiceGatewayImpl implements ServiceGateway {
     private final ServiceGroupMapper serviceGroupMapper;
     private final ModelGateway modelGateway;
     private final FieldGateway fieldGateway;
+    private final List<RelevanceTypeEnum> groupTypes = new ArrayList<RelevanceTypeEnum>(2) {{
+        add(RelevanceTypeEnum.REQUEST);
+        add(RelevanceTypeEnum.RESPONSE);
+    }};
 
 
     /**
@@ -61,11 +64,22 @@ public class ServiceGatewayImpl implements ServiceGateway {
      * @return {@link PageResponse<Service>}
      */
     @Override
-    public PageResponse<ServiceItem> searchPageList(ServicePageQry pageQry) {
+    public PageResponse<Service> searchPageList(ServicePageQry pageQry) {
         AssertUtils.isTrue(StringUtils.isNotBlank(pageQry.getProjectKey()), "项目唯一标识不能为空");
+        //获取项目内和指定类型的分组ID，作为服务的限定范围
+        Set<String> groupIds = getGroupIds(pageQry);
+        //不存在分组ID说明项目内不存在服务或者不存在限定条件的服务
+        if (CollectionUtils.isEmpty(groupIds)) {
+            return PageResponse.of(pageQry.getPageSize(), pageQry.getPageIndex());
+        }
         Page<Object> page = PageUtils.startPage(pageQry);
-        List<ServiceVO> list = serviceMapper.list(pageQry);
-        return PageUtils.of(list, page, ServiceItem::new);
+        LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
+        lqw.in(ServiceDO::getGroupId, groupIds)
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getName, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getDescription, pageQry.getKeyword())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getMethod, pageQry.getKeyword())
+                .eq(pageQry.getAccessMode() != null, ServiceDO::getAccessMode, pageQry.getAccessMode());
+        return PageUtils.of(serviceMapper.selectList(lqw), page, Service::new);
     }
 
     private Set<String> getGroupIds(ServicePageQry pageQry) {
@@ -164,18 +178,17 @@ public class ServiceGatewayImpl implements ServiceGateway {
         if (service == null) {
             return null;
         }
-
+        AssertUtils.isTrue(!existMethodName(service.getGroupId(), service.getMethod()), "方法名称重复");
+        if (ServiceTypeEnum.API == service.getType()) {
+            AssertUtils.isTrue(!existUri(service.getGroupId(), service.getUri()), "URI重复");
+        }
 
         ServiceDO serviceDO = ServiceConvertor.toEntity(service, queryByUuid(service.getUuid()));
-
-        if (ServiceTypeEnum.API == service.getType()) {
-            AssertUtils.isTrue(!existUri(service.getGroupId(), service.getUri(), service.getUuid()), "URI重复");
-        }
         //保存服务
         if (StringUtils.isEmpty(serviceDO.getUuid())) {
-            AssertUtils.isTrue(!existMethodName(service.getGroupId(), service.getMethod()), "方法名称重复");
             //判断服务新增是否成功
             AssertUtils.isTrue(serviceMapper.insert(serviceDO) > 0, "服务新增失败");
+
         } else {
             //更新服务
             //判断服务新增是否成功
@@ -238,18 +251,15 @@ public class ServiceGatewayImpl implements ServiceGateway {
      *
      * @param groupId 分组ID
      * @param uri     uri
-     * @param uuid    服务ID 可为空
      * @return
      */
     @Override
-    public boolean existUri(String groupId, String uri, String uuid) {
+    public boolean existUri(String groupId, String uri) {
         AssertUtils.isTrue(StringUtils.isNotBlank(groupId), "分组ID不能为空");
         AssertUtils.isTrue(StringUtils.isNotBlank(uri), "路径参数不能为空");
         LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ServiceDO::getGroupId, groupId)
-                .eq(ServiceDO::getUri, uri)
-                //自身去除
-                .ne(StringUtils.isNotBlank(uuid), ServiceDO::getUuid, uuid);
+                .eq(ServiceDO::getUri, uri);
         //项目的控制器类的方法具有唯一性
         return serviceMapper.selectCount(lqw) > 0;
     }
