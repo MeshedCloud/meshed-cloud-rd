@@ -2,4 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceMapper">
 
+    <select id="list" resultType="cn.meshed.cloud.rd.project.gatewayimpl.database.vo.ServiceVO">
+        SELECT
+        m_service_group.uri AS pre_uri,
+        m_service_group.type AS type,
+        m_service_group.uuid AS group_id,
+        m_service.uri AS uri,
+        m_service.version AS version,
+        m_service.owner_id AS owner_id,
+        m_service.`status` AS `status`,
+        m_service.release_status AS release_status,
+        m_service.`name` AS `name`,
+        m_service.access_mode AS access_mode,
+        m_service.request_type AS request_type,
+        m_service.uuid AS uuid,
+        m_service.identifier AS identifier
+        FROM
+        m_service_group
+        INNER JOIN
+        m_service
+        ON
+        m_service_group.uuid = m_service.group_id
+        WHERE m_service_group.project_key = #{projectKey}
+        <if test="type != null">
+            AND m_service_group.type = #{type}
+        </if>
+        <if test="accessMode != null">
+            AND m_service.access_mode = #{accessMode}
+        </if>
+        <if test="keyword != null">
+            AND m_service.`name` like '%'#{keyword}'%'
+        </if>
+
+    </select>
 </mapper>

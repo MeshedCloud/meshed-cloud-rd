@@ -4,8 +4,8 @@ import cn.meshed.cloud.rd.domain.project.ability.ServiceGroupAbility;
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
 import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
 import cn.meshed.cloud.rd.project.executor.command.ServiceGroupCmdExe;
-import cn.meshed.cloud.rd.project.executor.query.ServiceBySelectQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceGroupAvailableClassQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ServiceGroupBySelectQryExe;
 import cn.meshed.cloud.rd.project.query.ServiceAvailableClassQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
@@ -26,7 +26,7 @@ public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
 
     private final ServiceGroupCmdExe serviceGroupCmdExe;
     private final ServiceGroupAvailableClassQryExe serviceGroupAvailableClassQryExe;
-    private final ServiceBySelectQryExe serviceBySelectQryExe;
+    private final ServiceGroupBySelectQryExe serviceGroupBySelectQryExe;
 
     /**
      * 服务分组选择获取
@@ -36,7 +36,7 @@ public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
      */
     @Override
     public SingleResponse<Set<ServiceGroupSelectDTO>> select(String projectKey) {
-        return serviceBySelectQryExe.execute(projectKey);
+        return serviceGroupBySelectQryExe.execute(projectKey);
     }
 
     /**

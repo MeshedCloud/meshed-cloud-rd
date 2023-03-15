@@ -36,7 +36,7 @@ public class ServiceByUuidQryExe implements QueryExecute<String, SingleResponse<
         }
         ServiceDetailDTO detailDTO = CopyUtils.copy(service, ServiceDetailDTO.class);
         detailDTO.setRequests(CopyUtils.copyListProperties(service.getRequests(), RequestFieldDTO.class));
-        detailDTO.setResponses(CopyUtils.copyListProperties(service.getRequests(), ResponsesFieldDTO.class));
+        detailDTO.setResponses(CopyUtils.copyListProperties(service.getResponses(), ResponsesFieldDTO.class));
         return ResultUtils.of(detailDTO);
     }
 }

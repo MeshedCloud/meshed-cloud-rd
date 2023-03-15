@@ -46,7 +46,7 @@ public class ModelCmdExe implements CommandExecute<ModelCmd, Response> {
         model.setDomainKey(modelCmd.getDomain());
         AssertUtils.isTrue(StringUtils.isNotBlank(modelCmd.getProjectKey()), "项目Key不能为空");
         AssertUtils.isTrue(StringUtils.isNotBlank(modelCmd.getDomain()), "所属领域不能为空");
-        AssertUtils.isTrue(StringUtils.isNotBlank(modelCmd.getEnname()), "模型英文名称不能为空");
+        AssertUtils.isTrue(StringUtils.isNotBlank(modelCmd.getKey()), "模型英文名称不能为空");
         AssertUtils.isTrue(StringUtils.isNotBlank(modelCmd.getName()), "模型中文名称不能为空");
 
         if (StringUtils.isBlank(model.getUuid())) {
@@ -60,7 +60,7 @@ public class ModelCmdExe implements CommandExecute<ModelCmd, Response> {
                 return ResultUtils.fail("领域未新增");
             }
             assert project != null;
-            model.initModel(project, modelCmd.getEnname());
+            model.initModel(project, modelCmd.getKey());
         }
         List<RequestFieldDTO> fields = modelCmd.getFields();
         if (CollectionUtils.isNotEmpty(fields)) {

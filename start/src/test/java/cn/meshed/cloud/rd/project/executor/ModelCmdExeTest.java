@@ -37,7 +37,7 @@ public class ModelCmdExeTest {
         ModelCmd modelCmd = new ModelCmd();
         modelCmd.setDomain("property");
         modelCmd.setDescription("property xxx");
-        modelCmd.setEnname("Property");
+        modelCmd.setKey("Property");
         modelCmd.setName("资产操作");
         modelCmd.setProjectKey("PROPERTY");
         modelCmd.setType(ModelTypeEnum.COMMAND);

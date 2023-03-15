@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @Component
-public class ServiceBySelectQryExe implements QueryExecute<String, SingleResponse<Set<ServiceGroupSelectDTO>>> {
+public class ServiceGroupBySelectQryExe implements QueryExecute<String, SingleResponse<Set<ServiceGroupSelectDTO>>> {
 
     private final ServiceGroupGateway serviceGroupGateway;
 
