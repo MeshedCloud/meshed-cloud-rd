@@ -68,7 +68,7 @@ public class ServiceGroupGatewayImpl implements ServiceGroupGateway {
     public Set<ServiceGroup> select(String projectKey) {
         AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目唯一标识不能为空");
         LambdaQueryWrapper<ServiceGroupDO> lqw = new LambdaQueryWrapper<>();
-        lqw.select(ServiceGroupDO::getName, ServiceGroupDO::getClassName,
+        lqw.select(ServiceGroupDO::getName, ServiceGroupDO::getClassName, ServiceGroupDO::getType,
                 ServiceGroupDO::getUuid, ServiceGroupDO::getProjectKey);
         lqw.eq(ServiceGroupDO::getProjectKey, projectKey);
         return CopyUtils.copySetProperties(serviceGroupMapper.selectList(lqw), ServiceGroup::new);

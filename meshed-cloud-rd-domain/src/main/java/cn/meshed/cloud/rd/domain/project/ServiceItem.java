@@ -41,14 +41,9 @@ public class ServiceItem {
     private String groupId;
 
     /**
-     * 服务所属分组名称
-     */
-    private String groupName;
-
-    /**
      * 服务版本号
      */
-    private Long version;
+    private String version;
 
     /**
      * 服务负责人ID

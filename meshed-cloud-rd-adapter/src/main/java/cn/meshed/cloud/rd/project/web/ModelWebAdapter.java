@@ -5,6 +5,7 @@ import cn.meshed.cloud.rd.project.ModelAdapter;
 import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
+import cn.meshed.cloud.rd.project.data.ModelReleaseCountDTO;
 import cn.meshed.cloud.rd.project.query.ModelAvailableKeyQry;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
@@ -84,6 +85,15 @@ public class ModelWebAdapter implements ModelAdapter {
     @Override
     public SingleResponse<Set<String>> select(String projectKey) {
         return modelAbility.select(projectKey);
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    @Override
+    public SingleResponse<ModelReleaseCountDTO> releaseCount(String s) {
+        return SingleResponse.buildSuccess();
     }
 
 }

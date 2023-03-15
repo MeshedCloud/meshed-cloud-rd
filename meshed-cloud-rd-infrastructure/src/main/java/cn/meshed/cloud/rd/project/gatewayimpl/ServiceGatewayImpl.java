@@ -2,6 +2,7 @@ package cn.meshed.cloud.rd.project.gatewayimpl;
 
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Service;
+import cn.meshed.cloud.rd.domain.project.ServiceItem;
 import cn.meshed.cloud.rd.domain.project.constant.RelevanceTypeEnum;
 import cn.meshed.cloud.rd.domain.project.gateway.FieldGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
@@ -13,6 +14,7 @@ import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceGroupDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceGroupMapper;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ServiceMapper;
+import cn.meshed.cloud.rd.project.gatewayimpl.database.vo.ServiceVO;
 import cn.meshed.cloud.rd.project.query.ServiceGroupQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import cn.meshed.cloud.utils.AssertUtils;
@@ -28,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +52,6 @@ public class ServiceGatewayImpl implements ServiceGateway {
     private final ServiceGroupMapper serviceGroupMapper;
     private final ModelGateway modelGateway;
     private final FieldGateway fieldGateway;
-    private final List<RelevanceTypeEnum> groupTypes = new ArrayList<RelevanceTypeEnum>(2) {{
-        add(RelevanceTypeEnum.REQUEST);
-        add(RelevanceTypeEnum.RESPONSE);
-    }};
 
 
     /**
@@ -64,22 +61,24 @@ public class ServiceGatewayImpl implements ServiceGateway {
      * @return {@link PageResponse<Service>}
      */
     @Override
-    public PageResponse<Service> searchPageList(ServicePageQry pageQry) {
+    public PageResponse<ServiceItem> searchPageList(ServicePageQry pageQry) {
         AssertUtils.isTrue(StringUtils.isNotBlank(pageQry.getProjectKey()), "项目唯一标识不能为空");
         //获取项目内和指定类型的分组ID，作为服务的限定范围
-        Set<String> groupIds = getGroupIds(pageQry);
-        //不存在分组ID说明项目内不存在服务或者不存在限定条件的服务
-        if (CollectionUtils.isEmpty(groupIds)) {
-            return PageResponse.of(pageQry.getPageSize(), pageQry.getPageIndex());
-        }
+//        Set<String> groupIds = getGroupIds(pageQry);
+//        //不存在分组ID说明项目内不存在服务或者不存在限定条件的服务
+//        if (CollectionUtils.isEmpty(groupIds)) {
+//            return PageResponse.of(pageQry.getPageSize(), pageQry.getPageIndex());
+//        }
+//        Page<Object> page = PageUtils.startPage(pageQry);
+//        LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
+//        lqw.eq(pageQry.getAccessMode() != null, ServiceDO::getAccessMode, pageQry.getAccessMode())
+//                .in(ServiceDO::getGroupId, groupIds)
+//                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getName, pageQry.getKeyword())
+//                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getDescription, pageQry.getKeyword())
+//                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getMethod, pageQry.getKeyword());
         Page<Object> page = PageUtils.startPage(pageQry);
-        LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
-        lqw.in(ServiceDO::getGroupId, groupIds)
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getName, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getDescription, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getMethod, pageQry.getKeyword())
-                .eq(pageQry.getAccessMode() != null, ServiceDO::getAccessMode, pageQry.getAccessMode());
-        return PageUtils.of(serviceMapper.selectList(lqw), page, Service::new);
+        List<ServiceVO> list = serviceMapper.list(pageQry);
+        return PageUtils.of(list, page, ServiceItem::new);
     }
 
     private Set<String> getGroupIds(ServicePageQry pageQry) {
