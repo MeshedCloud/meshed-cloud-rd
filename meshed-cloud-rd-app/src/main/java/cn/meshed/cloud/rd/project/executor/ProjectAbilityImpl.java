@@ -6,8 +6,8 @@ import cn.meshed.cloud.rd.project.command.ProjectCmd;
 import cn.meshed.cloud.rd.project.data.ProjectDTO;
 import cn.meshed.cloud.rd.project.data.ProjectDetailDTO;
 import cn.meshed.cloud.rd.project.executor.command.ProjectCmdExe;
+import cn.meshed.cloud.rd.project.executor.query.ProjectAvailableKeyQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ProjectByKeyQryExe;
-import cn.meshed.cloud.rd.project.executor.query.ProjectExistKeyQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ProjectPageQryExe;
 import cn.meshed.cloud.rd.project.query.ProjectPageQry;
 import com.alibaba.cola.dto.PageResponse;
@@ -29,7 +29,7 @@ public class ProjectAbilityImpl implements ProjectAbility {
     private final ProjectCmdExe projectCmdExe;
     private final ProjectByKeyQryExe projectByKeyQryExe;
     private final ProjectPageQryExe projectPageQryExe;
-    private final ProjectExistKeyQryExe projectExistKeyQryExe;
+    private final ProjectAvailableKeyQryExe projectAvailableKeyQryExe;
 
     /**
      * 列表
@@ -82,7 +82,7 @@ public class ProjectAbilityImpl implements ProjectAbility {
      * @return 结果
      */
     @Override
-    public Response checkKey(String key) {
-        return projectExistKeyQryExe.execute(key);
+    public Response availableKey(String key) {
+        return projectAvailableKeyQryExe.execute(key);
     }
 }

@@ -6,6 +6,7 @@ import cn.meshed.cloud.rd.domain.project.constant.RelevanceTypeEnum;
 import cn.meshed.cloud.rd.domain.project.gateway.FieldGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
 import cn.meshed.cloud.rd.project.convertor.ModelConvertor;
+import cn.meshed.cloud.rd.project.enums.ModelAccessModeEnum;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ModelDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ModelMapper;
@@ -54,10 +55,11 @@ public class ModelGatewayImpl implements ModelGateway {
     public PageResponse<Model> searchPageList(ModelPageQry pageQry) {
         Page<Object> page = PageUtils.startPage(pageQry);
         LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
-        lqw.like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getName, pageQry.getKeyword())
+        lqw.ne(ModelDO::getAccessMode, ModelAccessModeEnum.PRIVATE)
+                .eq(pageQry.getType() != null, ModelDO::getType, pageQry.getType())
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getName, pageQry.getKeyword())
                 .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getDescription, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getClassName, pageQry.getKeyword())
-                .eq(pageQry.getType() != null, ModelDO::getType, pageQry.getType());
+                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getClassName, pageQry.getKeyword());
         return PageUtils.of(modelMapper.selectList(lqw), page, Model::new);
     }
 
@@ -312,4 +314,19 @@ public class ModelGatewayImpl implements ModelGateway {
                 .peek(model -> model.setFields(listMap.get(model.getUuid()))).collect(Collectors.toSet());
     }
 
+    /**
+     * <h1>选项查询</h1>
+     *
+     * @param projectKey
+     * @return {@link Set<String>}
+     */
+    @Override
+    public Set<String> select(String projectKey) {
+        assert StringUtils.isNotBlank(projectKey);
+        LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
+        lqw.select(ModelDO::getClassName)
+                .eq(ModelDO::getProjectKey, projectKey);
+        List<ModelDO> list = modelMapper.selectList(lqw);
+        return list.stream().map(ModelDO::getClassName).collect(Collectors.toSet());
+    }
 }
