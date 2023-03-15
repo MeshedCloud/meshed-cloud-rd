@@ -1,7 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.query;
 
 import cn.meshed.cloud.cqrs.QueryExecute;
-import cn.meshed.cloud.rd.domain.project.gateway.DomainGateway;
+import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.SingleResponse;
@@ -19,9 +19,9 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @Component
-public class DomainSelectQryExe implements QueryExecute<String, SingleResponse<Set<String>>> {
+public class ModelSelectQryExe implements QueryExecute<String, SingleResponse<Set<String>>> {
 
-    private final DomainGateway domainGateway;
+    private final ModelGateway modelGateway;
 
     /**
      * @param projectKey
@@ -29,8 +29,8 @@ public class DomainSelectQryExe implements QueryExecute<String, SingleResponse<S
      */
     @Override
     public SingleResponse<Set<String>> execute(String projectKey) {
-        AssertUtils.isTrue(StringUtils.isBlank(projectKey), "项目唯一标识不能为空");
-        Set<String> select = domainGateway.select(projectKey);
+        AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目唯一标识不能为空");
+        Set<String> select = modelGateway.select(projectKey);
         return ResultUtils.of(select);
     }
 }

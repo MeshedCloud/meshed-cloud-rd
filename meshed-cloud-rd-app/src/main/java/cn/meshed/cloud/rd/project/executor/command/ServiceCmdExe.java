@@ -1,6 +1,5 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
-import cn.hutool.core.util.StrUtil;
 import cn.meshed.cloud.cqrs.CommandExecute;
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Model;
@@ -63,6 +62,7 @@ public class ServiceCmdExe implements CommandExecute<ServiceCmd, Response> {
         assert serviceGroup != null;
         service.setGroupId(serviceGroup.getUuid());
         service.setProjectKey(serviceGroup.getProjectKey());
+        service.setClassName(serviceGroup.getClassName());
 
         Project project = projectGateway.queryByKey(serviceGroup.getProjectKey());
         AssertUtils.isTrue(project != null, "服务分组归属系统异常不存在");
@@ -83,10 +83,7 @@ public class ServiceCmdExe implements CommandExecute<ServiceCmd, Response> {
 
         Set<Model> newModels = service.handleFields(requests, responses);
         if (CollectionUtils.isNotEmpty(newModels)) {
-            String classNamePrefix = StrUtil.upperFirst(serviceGroup.getClassName()
-                    .replaceAll(serviceGroup.getType().getKey(), ""));
             newModels.forEach(model -> {
-                model.setClassName(classNamePrefix + model.getClassName());
                 model.setProjectKey(serviceGroup.getProjectKey());
                 model.setDomainKey(serviceGroup.getDomainKey());
                 model.buildPackageName(project.getBasePackage());

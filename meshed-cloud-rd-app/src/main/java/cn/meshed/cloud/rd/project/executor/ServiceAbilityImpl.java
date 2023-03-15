@@ -6,9 +6,11 @@ import cn.meshed.cloud.rd.project.data.ServiceDTO;
 import cn.meshed.cloud.rd.project.data.ServiceDetailDTO;
 import cn.meshed.cloud.rd.project.data.ServiceReleaseCountDTO;
 import cn.meshed.cloud.rd.project.executor.command.ServiceCmdExe;
+import cn.meshed.cloud.rd.project.executor.query.ServiceAvailableMethodQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceByUuidQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServicePageQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceReleaseCountQryExe;
+import cn.meshed.cloud.rd.project.query.ServiceAvailableMethodQry;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
@@ -30,6 +32,7 @@ public class ServiceAbilityImpl implements ServiceAbility {
     private final ServiceByUuidQryExe serviceByUuidQryExe;
     private final ServiceCmdExe serviceCmdExe;
     private final ServiceReleaseCountQryExe serviceReleaseCountQryExe;
+    private final ServiceAvailableMethodQryExe serviceAvailableMethodQryExe;
 
     /**
      * 列表
@@ -73,5 +76,16 @@ public class ServiceAbilityImpl implements ServiceAbility {
     @Override
     public SingleResponse<ServiceReleaseCountDTO> releaseCount(String projectKey) {
         return serviceReleaseCountQryExe.execute(projectKey);
+    }
+
+    /**
+     * 可用方法名称
+     *
+     * @param serviceAvailableMethodQry 方法名称参数
+     * @return 是否可用
+     */
+    @Override
+    public Response availableMethodName(ServiceAvailableMethodQry serviceAvailableMethodQry) {
+        return serviceAvailableMethodQryExe.execute(serviceAvailableMethodQry);
     }
 }

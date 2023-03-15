@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <h1>领域Web适配器</h1>
@@ -30,7 +31,7 @@ public class DomainWebAdapter implements DomainAdapter {
      * @return {@link SingleResponse<List<String>>}
      */
     @Override
-    public SingleResponse<List<String>> select(String projectKey) {
+    public SingleResponse<Set<String>> select(String projectKey) {
         return domainAbility.select(projectKey);
     }
 
@@ -43,5 +44,16 @@ public class DomainWebAdapter implements DomainAdapter {
     @Override
     public Response add(@Valid DomainCmd domainCmd) {
         return domainAbility.add(domainCmd);
+    }
+
+    /**
+     * 检查领域标识是否可用
+     *
+     * @param key 领域key
+     * @return {@link Response}
+     */
+    @Override
+    public Response availableKey(String key) {
+        return domainAbility.availableKey(key);
     }
 }

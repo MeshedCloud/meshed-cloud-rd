@@ -4,6 +4,7 @@ import cn.meshed.cloud.core.IBatchSave;
 import cn.meshed.cloud.core.IPageList;
 import cn.meshed.cloud.core.IQuery;
 import cn.meshed.cloud.core.ISave;
+import cn.meshed.cloud.core.ISelect;
 import cn.meshed.cloud.rd.domain.project.Model;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
@@ -17,7 +18,7 @@ import java.util.Set;
  * @version 1.0
  */
 public interface ModelGateway extends ISave<Model, String>, IQuery<String, Model>,
-        IBatchSave<Set<Model>, Integer>,
+        IBatchSave<Set<Model>, Integer>, ISelect<String, Set<String>>,
         IPageList<ModelPageQry, PageResponse<Model>> {
 
     /**

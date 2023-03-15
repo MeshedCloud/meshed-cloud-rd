@@ -4,7 +4,7 @@ import cn.meshed.cloud.rd.project.command.DomainCmd;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * <h1>领域能力</h1>
@@ -20,7 +20,7 @@ public interface DomainAbility {
      * @param projectKey 项目key
      * @return {@link SingleResponse < List <String>>}
      */
-    SingleResponse<List<String>> select(String projectKey);
+    SingleResponse<Set<String>> select(String projectKey);
 
     /**
      * 领域统计
@@ -29,4 +29,13 @@ public interface DomainAbility {
      * @return {@link Response}
      */
     Response add(DomainCmd domainCmd);
+
+    /**
+     * 可用领域key
+     *
+     * @param key 领域key
+     * @return 是否可用
+     */
+    Response availableKey(String key);
+
 }

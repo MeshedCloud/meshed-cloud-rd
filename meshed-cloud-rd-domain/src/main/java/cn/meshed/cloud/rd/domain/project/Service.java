@@ -197,7 +197,6 @@ public class Service implements Serializable {
         String name = this.name + "请求参数";
         //其他模式均需要合并，路径参数依旧支持独立（合并中依旧包含路径参数）
         Model model = buildBaseModel(requests, name);
-
         if (RequestModeEnum.PAGE == this.requestMode) {
             model.setType(getModelTypeEnum(RequestModeEnum.PAGE.name()));
             model.setSuperClass(PAGE_QUERY);
@@ -205,7 +204,10 @@ public class Service implements Serializable {
             model.setType(getModelTypeEnum("REQUEST"));
             model.setSuperClass(DTO);
         }
-        model.initModel(this.method);
+        String classNamePrefix = StrUtil.upperFirst(
+                this.className.replaceAll(this.type.getKey(), "")
+        );
+        model.initModel(classNamePrefix + this.method);
 
         Set<Field> fields = requests.stream().filter(Objects::nonNull)
                 .filter(field -> field.getGeneric() == BaseGenericsEnum.PATH_VARIABLE).collect(Collectors.toSet());
@@ -267,7 +269,10 @@ public class Service implements Serializable {
         Model model = buildBaseModel(responses, name);
         model.setType(getModelTypeEnum("RESPONSE"));
         model.setSuperClass(DTO);
-        model.initModel(this.method);
+        String classNamePrefix = StrUtil.upperFirst(
+                this.className.replaceAll(this.type.getKey(), "")
+        );
+        model.initModel(classNamePrefix + this.method);
         //组装成字段
         Field field = buildBaseField(name, model.getClassName());
         field.setGeneric(BaseGenericsEnum.NONE);

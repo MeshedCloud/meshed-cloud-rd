@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -53,15 +54,15 @@ public class DomainGatewayImpl implements DomainGateway {
      * @return
      */
     @Override
-    public List<String> select(String projectKey) {
+    public Set<String> select(String projectKey) {
         AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "参数请求错误");
         LambdaQueryWrapper<DomainDO> lqw = new LambdaQueryWrapper<>();
         lqw.select(DomainDO::getKey).eq(DomainDO::getProjectKey, projectKey);
         List<DomainDO> domainDOList = domainMapper.selectList(lqw);
         if (CollectionUtils.isEmpty(domainDOList)) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        return domainDOList.stream().map(DomainDO::getKey).collect(Collectors.toList());
+        return domainDOList.stream().map(DomainDO::getKey).collect(Collectors.toSet());
     }
 
     /**
