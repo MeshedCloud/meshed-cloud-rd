@@ -73,7 +73,7 @@ public class WarehouseDO extends BaseEntity {
     /**
      * 仓库版本号
      */
-    private String version;
+    private Long version;
 
     /**
      * 仓库负责人ID

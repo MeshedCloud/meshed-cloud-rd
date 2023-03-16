@@ -61,6 +61,6 @@ public interface ModelGateway extends ISave<Model, String>, IQuery<String, Model
      * @param models     模型
      * @return 成功与否
      */
-    boolean batchSaveOrOnlyUpdateField(String projectKey, Set<Model> models);
+    boolean batchSaveOrUpdate(String projectKey, Set<Model> models);
 
 }

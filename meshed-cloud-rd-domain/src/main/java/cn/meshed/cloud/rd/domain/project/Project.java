@@ -58,7 +58,7 @@ public class Project implements Serializable {
     /**
      * 项目版本号
      */
-    private String version;
+    private Long version;
 
     /**
      * 项目基本包名

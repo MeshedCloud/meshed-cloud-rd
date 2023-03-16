@@ -177,17 +177,18 @@ public class ServiceGatewayImpl implements ServiceGateway {
         if (service == null) {
             return null;
         }
-        AssertUtils.isTrue(!existMethodName(service.getGroupId(), service.getMethod()), "方法名称重复");
-        if (ServiceTypeEnum.API == service.getType()) {
-            AssertUtils.isTrue(!existUri(service.getGroupId(), service.getUri()), "URI重复");
-        }
+
 
         ServiceDO serviceDO = ServiceConvertor.toEntity(service, queryByUuid(service.getUuid()));
+
+        if (ServiceTypeEnum.API == service.getType()) {
+            AssertUtils.isTrue(!existUri(service.getGroupId(), service.getUri(), service.getUuid()), "URI重复");
+        }
         //保存服务
         if (StringUtils.isEmpty(serviceDO.getUuid())) {
+            AssertUtils.isTrue(!existMethodName(service.getGroupId(), service.getMethod()), "方法名称重复");
             //判断服务新增是否成功
             AssertUtils.isTrue(serviceMapper.insert(serviceDO) > 0, "服务新增失败");
-
         } else {
             //更新服务
             //判断服务新增是否成功
@@ -250,15 +251,18 @@ public class ServiceGatewayImpl implements ServiceGateway {
      *
      * @param groupId 分组ID
      * @param uri     uri
+     * @param uuid    服务ID 可为空
      * @return
      */
     @Override
-    public boolean existUri(String groupId, String uri) {
+    public boolean existUri(String groupId, String uri, String uuid) {
         AssertUtils.isTrue(StringUtils.isNotBlank(groupId), "分组ID不能为空");
         AssertUtils.isTrue(StringUtils.isNotBlank(uri), "路径参数不能为空");
         LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
         lqw.eq(ServiceDO::getGroupId, groupId)
-                .eq(ServiceDO::getUri, uri);
+                .eq(ServiceDO::getUri, uri)
+                //自身去除
+                .ne(StringUtils.isNotBlank(uuid), ServiceDO::getUuid, uuid);
         //项目的控制器类的方法具有唯一性
         return serviceMapper.selectCount(lqw) > 0;
     }

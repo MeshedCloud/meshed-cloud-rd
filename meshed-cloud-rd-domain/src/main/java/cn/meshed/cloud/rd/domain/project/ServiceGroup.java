@@ -54,7 +54,7 @@ public class ServiceGroup implements Serializable {
     /**
      * 服务分组版本号
      */
-    private String version;
+    private Long version;
 
     /**
      * 服务分组所属领域key

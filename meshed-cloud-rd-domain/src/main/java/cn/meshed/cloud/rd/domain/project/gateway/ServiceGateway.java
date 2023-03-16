@@ -33,9 +33,10 @@ public interface ServiceGateway extends ISave<Service, String>, IQuery<String, S
      *
      * @param groupId 分组ID
      * @param uri     uri
+     * @param uuid    服务ID 可为空
      * @return
      */
-    boolean existUri(String groupId, String uri);
+    boolean existUri(String groupId, String uri, String uuid);
 
     /**
      * 查询项目的待发布服务详情列表

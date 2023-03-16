@@ -2,6 +2,7 @@ package cn.meshed.cloud.rd.project.convertor;
 
 
 import cn.meshed.cloud.rd.domain.project.Model;
+import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ModelDO;
 import cn.meshed.cloud.utils.CopyUtils;
 
@@ -19,6 +20,16 @@ public class ModelConvertor implements Serializable {
         if (modelDO == null) {
             return CopyUtils.copy(model, ModelDO.class);
         }
+
+        //如果是已经存在正式版本，升级版本
+        if (ReleaseStatusEnum.RELEASE == model.getReleaseStatus()) {
+            modelDO.setVersion(modelDO.getVersion() + 1);
+            //清除UUID使其新建
+            modelDO.setUuid(null);
+        }
+
+        //即使已经是快照/发布中都会回归到编辑状态
+        modelDO.setReleaseStatus(ReleaseStatusEnum.EDIT);
         modelDO.setName(model.getName());
         modelDO.setDescription(modelDO.getDescription());
         return modelDO;

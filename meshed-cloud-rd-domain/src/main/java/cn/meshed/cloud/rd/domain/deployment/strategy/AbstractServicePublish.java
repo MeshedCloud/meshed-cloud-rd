@@ -140,7 +140,7 @@ public abstract class AbstractServicePublish {
         objectDefinition.setDescription(serviceGroup.getDescription());
         objectDefinition.setPackageName(serviceGroup.getPackageName());
         objectDefinition.setExplain(serviceGroup.getName());
-        objectDefinition.setVersion(serviceGroup.getVersion());
+        objectDefinition.setVersion(serviceGroup.getVersion().toString());
     }
 
     /**

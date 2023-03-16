@@ -106,7 +106,7 @@ public class ModelPublishHandler extends AbstractServicePublish implements Publi
         objectModel.setClassName(model.getClassName());
         objectModel.setSuperClass(model.getSuperClass());
         objectModel.setExplain(model.getName());
-        objectModel.setVersion(model.getVersion());
+        objectModel.setVersion(model.getVersion().toString());
 
         if (CollectionUtils.isNotEmpty(model.getFields())) {
             //字段转换

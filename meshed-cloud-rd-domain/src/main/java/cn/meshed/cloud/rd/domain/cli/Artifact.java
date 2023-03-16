@@ -47,7 +47,7 @@ public class Artifact {
     private Map<String, String> extendedMap;
 
     public Artifact() {
-        this.version = INIT_VERSION;
+        this.version = String.valueOf(INIT_VERSION);
         this.extendedMap = new HashMap<>();
     }
 
@@ -55,7 +55,8 @@ public class Artifact {
         this.groupId = groupId;
         this.packageName = groupId;
         this.artifactId = artifactId;
-        this.version = INIT_VERSION;
+        //todo 版本转换工具
+        this.version = String.valueOf(INIT_VERSION);
         this.extendedMap = new HashMap<>();
     }
 
@@ -97,7 +98,7 @@ public class Artifact {
         AssertUtils.isTrue(StringUtils.isNotBlank(this.artifactId), "制品库ID");
         //如果未配置默认为初代快照版本
         if (StringUtils.isBlank(this.version)) {
-            this.version = INIT_VERSION;
+            this.version = String.valueOf(INIT_VERSION);
             this.enableSnapshot();
         }
         //包名如果不存在则认为同分组ID

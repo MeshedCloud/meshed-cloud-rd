@@ -39,6 +39,10 @@ public class ServiceVO {
      * 服务所属分组
      */
     private String groupId;
+    /**
+     * 服务所属分组名称
+     */
+    private String groupName;
 
     /**
      * 服务版本号

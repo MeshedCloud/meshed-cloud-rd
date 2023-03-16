@@ -11,7 +11,7 @@ public interface ProjectConstant {
     String PROJECT_PACKAGE_NAME_FORMAT = "%s.%s";
     String SERVICE_PACKAGE_NAME_FORMAT = "%s.%s.%s";
     String MODEL_PACKAGE_NAME_FORMAT = "%s.%s.%s.%s";
-    String INIT_VERSION = "1.0.0";
+    Long INIT_VERSION = 10000L;
     String INIT_BASE_PACKAGE = "cn.meshed.cloud";
 
 }

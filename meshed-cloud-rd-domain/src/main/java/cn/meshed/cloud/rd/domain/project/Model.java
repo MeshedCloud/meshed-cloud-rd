@@ -56,7 +56,7 @@ public class Model implements Serializable {
     /**
      * 模型版本号
      */
-    private String version;
+    private Long version;
 
     /**
      * 模型负责人ID
