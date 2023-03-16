@@ -7,6 +7,7 @@
         m_service_group.uri AS pre_uri,
         m_service_group.type AS type,
         m_service_group.uuid AS group_id,
+        m_service_group.`name` AS group_name,
         m_service.uri AS uri,
         m_service.version AS version,
         m_service.owner_id AS owner_id,
@@ -27,11 +28,14 @@
         <if test="type != null">
             AND m_service_group.type = #{type}
         </if>
+        <if test="releaseStatus != null">
+            AND m_service.release_status = #{releaseStatus}
+        </if>
         <if test="accessMode != null">
             AND m_service.access_mode = #{accessMode}
         </if>
         <if test="keyword != null">
-            AND m_service.`name` like '%'#{keyword}'%'
+            AND m_service.`name` like concat('%',#{keyword},'%')
         </if>
 
     </select>

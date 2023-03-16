@@ -31,17 +31,6 @@ public class ServicePageQryExe implements QueryExecute<ServicePageQry, PageRespo
     @Override
     public PageResponse<ServiceDTO> execute(ServicePageQry servicePageQry) {
         PageResponse<ServiceItem> pageResponse = serviceGateway.searchPageList(servicePageQry);
-//        if (CollectionUtils.isNotEmpty(pageResponse.getData())) {
-//            Set<String> uuids = pageResponse.getData().stream().map(Service::getGroupId).collect(Collectors.toSet());
-//            List<ServiceGroup> serviceGroups = serviceGroupGateway.searchList(uuids);
-//            Map<String, ServiceGroup> serviceGroupMap = serviceGroups.stream()
-//                    .collect(Collectors.toMap(ServiceGroup::getUuid, Function.identity()));
-//            pageResponse.getData().forEach(service -> {
-//                ServiceGroup serviceGroup = serviceGroupMap.get(service.getGroupId());
-//                service.setType(serviceGroup.getType());
-//                service.setClassName(serviceGroup.getClassName());
-//            });
-//        }
         return ResultUtils.copyPage(pageResponse, ServiceDTO::new);
     }
 }
