@@ -28,8 +28,8 @@ public class ModelConvertor implements Serializable {
             modelDO.setUuid(null);
         }
 
-        //即使已经是快照/发布中都会回归到编辑状态
-        modelDO.setReleaseStatus(ReleaseStatusEnum.EDIT);
+        //更新为业务指定的类型
+        modelDO.setReleaseStatus(model.getReleaseStatus());
         modelDO.setName(model.getName());
         modelDO.setDescription(modelDO.getDescription());
         return modelDO;

@@ -47,7 +47,7 @@ public class ServiceVO {
     /**
      * 服务版本号
      */
-    private String version;
+    private Long version;
 
     /**
      * 服务负责人ID
