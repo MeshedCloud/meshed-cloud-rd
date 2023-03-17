@@ -34,6 +34,8 @@ public class ModelByUuidQryExe implements QueryExecute<String, SingleResponse<Mo
             return ResultUtils.fail("模型不存在");
         }
         ModelDetailDTO detailDTO = CopyUtils.copy(model, ModelDetailDTO.class);
+        detailDTO.setDomain(model.getDomainKey());
+        detailDTO.setKey(model.getClassName().replace(model.getType().getKey(), ""));
         detailDTO.setFields(CopyUtils.copyListProperties(model.getFields(), RequestFieldDTO.class));
         return ResultUtils.of(detailDTO);
     }

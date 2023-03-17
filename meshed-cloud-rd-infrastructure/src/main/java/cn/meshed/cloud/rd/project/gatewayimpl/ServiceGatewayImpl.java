@@ -63,19 +63,6 @@ public class ServiceGatewayImpl implements ServiceGateway {
     @Override
     public PageResponse<ServiceItem> searchPageList(ServicePageQry pageQry) {
         AssertUtils.isTrue(StringUtils.isNotBlank(pageQry.getProjectKey()), "项目唯一标识不能为空");
-        //获取项目内和指定类型的分组ID，作为服务的限定范围
-//        Set<String> groupIds = getGroupIds(pageQry);
-//        //不存在分组ID说明项目内不存在服务或者不存在限定条件的服务
-//        if (CollectionUtils.isEmpty(groupIds)) {
-//            return PageResponse.of(pageQry.getPageSize(), pageQry.getPageIndex());
-//        }
-//        Page<Object> page = PageUtils.startPage(pageQry);
-//        LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
-//        lqw.eq(pageQry.getAccessMode() != null, ServiceDO::getAccessMode, pageQry.getAccessMode())
-//                .in(ServiceDO::getGroupId, groupIds)
-//                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getName, pageQry.getKeyword())
-//                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getDescription, pageQry.getKeyword())
-//                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ServiceDO::getMethod, pageQry.getKeyword());
         Page<Object> page = PageUtils.startPage(pageQry);
         List<ServiceVO> list = serviceMapper.list(pageQry);
         return PageUtils.of(list, page, ServiceItem::new);

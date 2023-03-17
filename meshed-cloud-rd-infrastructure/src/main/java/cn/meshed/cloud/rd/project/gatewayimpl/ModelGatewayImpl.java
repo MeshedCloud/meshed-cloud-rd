@@ -58,10 +58,13 @@ public class ModelGatewayImpl implements ModelGateway {
         Page<Object> page = PageUtils.startPage(pageQry);
         LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
         lqw.ne(ModelDO::getAccessMode, ModelAccessModeEnum.PRIVATE)
+                .eq(pageQry.getReleaseStatus() != null, ModelDO::getReleaseStatus, pageQry.getReleaseStatus())
                 .eq(pageQry.getType() != null, ModelDO::getType, pageQry.getType())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getName, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getDescription, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ModelDO::getClassName, pageQry.getKeyword());
+                .and(StringUtils.isNotBlank(pageQry.getKeyword()), queryWrapper -> {
+                    queryWrapper.like(ModelDO::getName, pageQry.getKeyword())
+                            .or().like(ModelDO::getDescription, pageQry.getKeyword())
+                            .or().like(ModelDO::getClassName, pageQry.getKeyword());
+                });
         return PageUtils.of(modelMapper.selectList(lqw), page, Model::new);
     }
 
@@ -153,7 +156,6 @@ public class ModelGatewayImpl implements ModelGateway {
         }
         if (CollectionUtils.isNotEmpty(updateModels)) {
             modelMapper.updateBatch(updateModels);
-//            updateModels.forEach(modelMapper::updateById);
         }
 
         //
