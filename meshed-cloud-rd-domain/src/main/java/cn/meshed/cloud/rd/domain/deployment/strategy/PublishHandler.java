@@ -6,7 +6,7 @@ package cn.meshed.cloud.rd.domain.deployment.strategy;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface PublishHandler<T extends PublishData> {
+public interface PublishHandler<T extends Publish> {
 
 
     /**

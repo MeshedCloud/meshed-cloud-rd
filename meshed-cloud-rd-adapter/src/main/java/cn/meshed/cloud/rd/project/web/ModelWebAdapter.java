@@ -40,7 +40,7 @@ public class ModelWebAdapter implements ModelAdapter {
     @Override
     public PageResponse<ModelDTO> list(String projectKey, @Valid ModelPageQry modelPageQry) {
         modelPageQry.setProjectKey(projectKey);
-        return modelAbility.list(modelPageQry);
+        return modelAbility.searchPageList(modelPageQry);
     }
 
     /**

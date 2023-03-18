@@ -2,16 +2,18 @@ package cn.meshed.cloud.rd.deployment.web;
 
 import cn.meshed.cloud.rd.deployment.WarehouseAdapter;
 import cn.meshed.cloud.rd.deployment.command.WarehouseAddCmd;
-import cn.meshed.cloud.rd.deployment.command.WarehouseImportCmd;
 import cn.meshed.cloud.rd.deployment.data.WarehouseDTO;
+import cn.meshed.cloud.rd.deployment.data.WarehouseSelectDTO;
 import cn.meshed.cloud.rd.deployment.query.WarehousePageQry;
 import cn.meshed.cloud.rd.domain.deployment.ability.WarehouseAbility;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
+import com.alibaba.cola.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <h1>仓库Web适配器</h1>
@@ -35,7 +37,7 @@ public class WarehouseWebAdapter implements WarehouseAdapter {
     @Override
     public PageResponse<WarehouseDTO> list(String projectKey, @Valid WarehousePageQry warehousePageQry) {
         warehousePageQry.setProjectKey(projectKey);
-        return warehouseAbility.list(warehousePageQry);
+        return warehouseAbility.searchPageList(warehousePageQry);
     }
 
     /**
@@ -45,18 +47,19 @@ public class WarehouseWebAdapter implements WarehouseAdapter {
      * @return {@link Response}
      */
     @Override
-    public Response add(@Valid WarehouseAddCmd warehouseAddCmd) {
-        return null;
+    public Response add(WarehouseAddCmd warehouseAddCmd) {
+        return warehouseAbility.add(warehouseAddCmd);
     }
 
     /**
-     * 注册信息/导入仓库
+     * 逻辑仓库选项
      *
-     * @param warehouseImportCmd 仓库登记/导入功能
-     * @return {@link Response}
+     * @param projectKey 项目唯一标识
+     * @return {@link SingleResponse<List<WarehouseSelectDTO>>}
      */
     @Override
-    public Response warehouseImport(@Valid WarehouseImportCmd warehouseImportCmd) {
-        return null;
+    public SingleResponse<List<WarehouseSelectDTO>> select(@Valid String projectKey) {
+        return warehouseAbility.select(projectKey);
     }
+
 }

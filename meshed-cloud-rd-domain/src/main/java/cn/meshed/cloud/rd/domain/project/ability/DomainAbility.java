@@ -1,5 +1,6 @@
 package cn.meshed.cloud.rd.domain.project.ability;
 
+import cn.meshed.cloud.core.ISelect;
 import cn.meshed.cloud.rd.project.command.DomainCmd;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
@@ -12,15 +13,7 @@ import java.util.Set;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface DomainAbility {
-
-    /**
-     * 领域统计
-     *
-     * @param projectKey 项目key
-     * @return {@link SingleResponse < List <String>>}
-     */
-    SingleResponse<Set<String>> select(String projectKey);
+public interface DomainAbility extends ISelect<String, SingleResponse<Set<String>>> {
 
     /**
      * 领域统计

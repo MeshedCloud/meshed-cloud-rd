@@ -3,7 +3,10 @@ package cn.meshed.cloud.rd.deployment.executor.query;
 import cn.meshed.cloud.cqrs.QueryExecute;
 import cn.meshed.cloud.rd.deployment.data.WarehouseDTO;
 import cn.meshed.cloud.rd.deployment.query.WarehousePageQry;
-import com.alibaba.cola.dto.SingleResponse;
+import cn.meshed.cloud.rd.domain.deployment.Warehouse;
+import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
+import cn.meshed.cloud.utils.ResultUtils;
+import com.alibaba.cola.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +18,17 @@ import org.springframework.stereotype.Component;
  */
 @RequiredArgsConstructor
 @Component
-public class WarehousePageQryExe implements QueryExecute<WarehousePageQry, SingleResponse<WarehouseDTO>> {
+public class WarehousePageQryExe implements QueryExecute<WarehousePageQry, PageResponse<WarehouseDTO>> {
+
+    private final WarehouseGateway warehouseGateway;
+
     /**
      * @param warehousePageQry
      * @return
      */
     @Override
-    public SingleResponse<WarehouseDTO> execute(WarehousePageQry warehousePageQry) {
-        return null;
+    public PageResponse<WarehouseDTO> execute(WarehousePageQry warehousePageQry) {
+        PageResponse<Warehouse> pageResponse = warehouseGateway.searchPageList(warehousePageQry);
+        return ResultUtils.copyPage(pageResponse, WarehouseDTO::new);
     }
 }

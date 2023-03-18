@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.meshed.cloud.rd.deployment.gatewayimpl.database.mapper.VersionMapper">
+
+    <select id="list" resultType="cn.meshed.cloud.rd.deployment.gatewayimpl.database.vo.VersionVO">
+        SELECT
+        m_warehouse.repo_name AS versionName,
+        m_warehouse.uuid AS sourceId,
+        m_version.version AS version,
+        m_version.environment AS environments,
+        m_version.id AS id,
+        m_version.type AS type,
+        m_version.`status` AS `status`,
+        m_warehouse.`name` AS `name`
+        FROM
+        m_warehouse
+        INNER JOIN
+        m_version
+        ON
+        m_warehouse.uuid = m_version.source_id
+        WHERE 1=1
+        <if test="projectKey != null">
+            AND m_version.project_key = #{projectKey}
+        </if>
+    </select>
+</mapper>

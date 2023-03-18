@@ -57,7 +57,7 @@ public class RpcPublishHandler extends AbstractServicePublish implements Publish
         Set<Rpc> rpcList = serviceGroups.stream().map(this::toRpc).collect(Collectors.toSet());
 
         //新增接口
-        getCliGateway().asyncGenerateRpcWithPush(servicePublish.getRepositoryId(),
+        getCliGateway().asyncGenerateRpcWithPush(servicePublish.getSourceId(),
                 buildGenerateRpc(servicePublish, rpcList));
     }
 
@@ -66,7 +66,7 @@ public class RpcPublishHandler extends AbstractServicePublish implements Publish
         GenerateRpc generateRpc = new GenerateRpc();
         generateRpc.setRpcList(rpcList);
         generateRpc.setBasePath(SRC_PATH);
-        generateRpc.setCommitMessage(servicePublish.getCommitMessage());
+        generateRpc.setCommitMessage(servicePublish.getMessage());
         generateRpc.setBranch(servicePublish.getBranch());
         return generateRpc;
     }

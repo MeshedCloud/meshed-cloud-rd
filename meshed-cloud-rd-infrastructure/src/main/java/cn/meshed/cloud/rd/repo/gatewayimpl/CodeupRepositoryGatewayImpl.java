@@ -142,8 +142,8 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
         if (StringUtils.isNotBlank(createRepository.getImportUrl())) {
             request.setImportUrl(createRepository.getImportUrl());
         }
-        if (StringUtils.isNotBlank(createRepository.getImportUrl())) {
-            request.setImportUrl(createRepository.getImportUrl());
+        if (StringUtils.isNotBlank(createRepository.getImportToken())) {
+            request.setAccessToken(createRepository.getImportToken());
         }
         return request;
     }

@@ -21,7 +21,7 @@ import java.util.Map;
 @Component
 public class AsyncPublishStrategy implements BeanPostProcessor {
 
-    private static final Map<PublishType, PublishHandler<PublishData>> PUBLISH_HANDLER_MAP = new EnumMap<>(PublishType.class);
+    private static final Map<PublishType, PublishHandler<Publish>> PUBLISH_HANDLER_MAP = new EnumMap<>(PublishType.class);
 
     private ApplicationContext applicationContext;
 
@@ -30,7 +30,7 @@ public class AsyncPublishStrategy implements BeanPostProcessor {
         if (!(bean instanceof PublishHandler)) {
             return bean;
         }
-        PublishHandler<PublishData> handler = (PublishHandler) bean;
+        PublishHandler<Publish> handler = (PublishHandler) bean;
         PUBLISH_HANDLER_MAP.put(handler.getPublishType(), handler);
         return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
     }
@@ -39,16 +39,16 @@ public class AsyncPublishStrategy implements BeanPostProcessor {
      * 异步发送
      *
      * @param publishType 发布类型
-     * @param publishData 发布参数数据
+     * @param publish     发布参数数据
      */
     @Async
-    public Response asyncPublish(PublishType publishType, PublishData publishData) {
-        AssertUtils.isTrue(publishType != null && publishData != null, "请检查参数是否合法");
-        PublishHandler<PublishData> publishHandler = PUBLISH_HANDLER_MAP.get(publishType);
+    public Response asyncPublish(PublishType publishType, Publish publish) {
+        AssertUtils.isTrue(publishType != null && publish != null, "请检查参数是否合法");
+        PublishHandler<Publish> publishHandler = PUBLISH_HANDLER_MAP.get(publishType);
         if (publishHandler == null) {
             return ResultUtils.fail("策略未被实现");
         }
-        publishHandler.publish(publishData);
+        publishHandler.publish(publish);
         return ResultUtils.ok();
     }
 

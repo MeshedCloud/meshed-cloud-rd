@@ -37,6 +37,9 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
     @Value("${rd.project.group-format}")
     private String groupFormat;
 
+    @Value("${workflow.approve.enable:false}")
+    private boolean approveEnable;
+
     /**
      * 仅新增项目处理器
      *
@@ -54,14 +57,16 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
         if (saveProject == null) {
             return ResultUtils.fail("发起立项失败");
         }
-        //发起初始化事件
-        publishInitialize(projectCmd);
-        return ResultUtils.ok();
-    }
-
-    private void publishInitialize(ProjectCmd projectCmd) {
         ProjectInitializeEvent event = CopyUtils.copy(projectCmd, ProjectInitializeEvent.class);
-        streamBridgeSender.send(PROJECT_INITIALIZE, event);
+        //走审批流
+        if (approveEnable) {
+
+        } else {
+            //发起初始化事件
+            streamBridgeSender.send(PROJECT_INITIALIZE, event);
+        }
+
+        return ResultUtils.ok();
     }
 
     private RepositoryGroup buildGroup(ProjectCmd projectCmd) {

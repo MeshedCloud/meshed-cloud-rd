@@ -36,7 +36,7 @@ public class ProjectWebAdapter implements ProjectAdapter {
      */
     @Override
     public PageResponse<ProjectDTO> list(@Valid ProjectPageQry projectPageQry) {
-        return projectAbility.list(projectPageQry);
+        return projectAbility.searchPageList(projectPageQry);
     }
 
     /**

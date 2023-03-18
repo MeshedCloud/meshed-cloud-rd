@@ -1,11 +1,16 @@
 package cn.meshed.cloud.rd.domain.deployment.ability;
 
+import cn.meshed.cloud.core.IPageList;
+import cn.meshed.cloud.core.ISelect;
 import cn.meshed.cloud.rd.deployment.command.WarehouseAddCmd;
-import cn.meshed.cloud.rd.deployment.command.WarehouseImportCmd;
 import cn.meshed.cloud.rd.deployment.data.WarehouseDTO;
+import cn.meshed.cloud.rd.deployment.data.WarehouseSelectDTO;
 import cn.meshed.cloud.rd.deployment.query.WarehousePageQry;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
+import com.alibaba.cola.dto.SingleResponse;
+
+import java.util.List;
 
 /**
  * <h1></h1>
@@ -13,15 +18,8 @@ import com.alibaba.cola.dto.Response;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface WarehouseAbility {
-
-    /**
-     * 仓库列表
-     *
-     * @param warehousePageQry 仓库分页查询
-     * @return
-     */
-    PageResponse<WarehouseDTO> list(WarehousePageQry warehousePageQry);
+public interface WarehouseAbility extends IPageList<WarehousePageQry, PageResponse<WarehouseDTO>>,
+        ISelect<String, SingleResponse<List<WarehouseSelectDTO>>> {
 
     /**
      * 新增仓库
@@ -31,11 +29,4 @@ public interface WarehouseAbility {
      */
     Response add(WarehouseAddCmd warehouseAddCmd);
 
-    /**
-     * 导入仓库
-     *
-     * @param warehouseImportCmd 仓库登记/导入功能
-     * @return {@link Response}
-     */
-    Response warehouseImport(WarehouseImportCmd warehouseImportCmd);
 }

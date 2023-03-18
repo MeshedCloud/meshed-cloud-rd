@@ -1,5 +1,8 @@
 package cn.meshed.cloud.rd.domain.project.ability;
 
+import cn.meshed.cloud.core.IDetails;
+import cn.meshed.cloud.core.IPageList;
+import cn.meshed.cloud.core.ISave;
 import cn.meshed.cloud.rd.project.command.ProjectChangeCmd;
 import cn.meshed.cloud.rd.project.command.ProjectCmd;
 import cn.meshed.cloud.rd.project.data.ProjectDTO;
@@ -9,39 +12,14 @@ import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
 
-import javax.validation.Valid;
-
 /**
  * <h1>项目能力</h1>
  *
  * @author Vincent Vic
  * @version 1.0
  */
-public interface ProjectAbility {
-
-    /**
-     * 列表
-     *
-     * @param projectPageQry 项目分页查询
-     * @return {@link PageResponse < ProjectDTO >}
-     */
-    PageResponse<ProjectDTO> list(ProjectPageQry projectPageQry);
-
-    /**
-     * 详情
-     *
-     * @param projectKey 项目key
-     * @return {@link SingleResponse <ProjectDetailDTO >}
-     */
-    SingleResponse<ProjectDetailDTO> details(String projectKey);
-
-    /**
-     * 保存功能
-     *
-     * @param projectCmd 项目数据
-     * @return {@link Response}
-     */
-    Response save(@Valid ProjectCmd projectCmd);
+public interface ProjectAbility extends IPageList<ProjectPageQry, PageResponse<ProjectDTO>>,
+        IDetails<String, SingleResponse<ProjectDetailDTO>>, ISave<ProjectCmd, Response> {
 
     /**
      * 变更项目

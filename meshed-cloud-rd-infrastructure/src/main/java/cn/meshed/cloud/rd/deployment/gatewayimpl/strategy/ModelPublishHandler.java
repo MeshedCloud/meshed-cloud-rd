@@ -73,8 +73,8 @@ public class ModelPublishHandler extends AbstractServicePublish implements Publi
         }
         //转换数据
         Set<ObjectModel> objectModels = models.stream().map(this::toObjectModel).collect(Collectors.toSet());
-        return generateModelWithPush(modelPublish.getRepositoryId(), objectModels,
-                modelPublish.getBasePath(), modelPublish.getCommitMessage(), modelPublish.getBranch());
+        return generateModelWithPush(modelPublish.getSourceId(), objectModels,
+                modelPublish.getBasePath(), modelPublish.getMessage(), modelPublish.getBranch());
     }
 
     private boolean generateModelWithPush(String repositoryId, Set<ObjectModel> objectModels,

@@ -61,7 +61,7 @@ public class AdapterPublishHandler extends AbstractServicePublish implements Pub
         Set<Adapter> adapters = serviceGroups.stream().map(this::toAdapter).collect(Collectors.toSet());
 
         //新增接口
-        getCliGateway().asyncGenerateAdapterWithPush(servicePublish.getRepositoryId(),
+        getCliGateway().asyncGenerateAdapterWithPush(servicePublish.getSourceId(),
                 buildGenerateAdapter(servicePublish, adapters));
     }
 
@@ -70,7 +70,7 @@ public class AdapterPublishHandler extends AbstractServicePublish implements Pub
         GenerateAdapter generateAdapter = new GenerateAdapter();
         generateAdapter.setAdapters(adapters);
         generateAdapter.setBasePath(SRC_PATH);
-        generateAdapter.setCommitMessage(servicePublish.getCommitMessage());
+        generateAdapter.setCommitMessage(servicePublish.getMessage());
         generateAdapter.setBranch(servicePublish.getBranch());
         return generateAdapter;
     }

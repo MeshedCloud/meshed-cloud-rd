@@ -41,7 +41,7 @@ public class ServiceAbilityImpl implements ServiceAbility {
      * @return {@link PageResponse < ServiceDTO >}
      */
     @Override
-    public PageResponse<ServiceDTO> list(ServicePageQry servicePageQry) {
+    public PageResponse<ServiceDTO> searchPageList(ServicePageQry servicePageQry) {
         return servicePageQryExe.execute(servicePageQry);
     }
 

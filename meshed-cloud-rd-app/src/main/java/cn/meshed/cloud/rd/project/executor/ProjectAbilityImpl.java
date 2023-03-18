@@ -38,7 +38,7 @@ public class ProjectAbilityImpl implements ProjectAbility {
      * @return {@link PageResponse < ProjectDTO >}
      */
     @Override
-    public PageResponse<ProjectDTO> list(ProjectPageQry projectPageQry) {
+    public PageResponse<ProjectDTO> searchPageList(ProjectPageQry projectPageQry) {
         return projectPageQryExe.execute(projectPageQry);
     }
 

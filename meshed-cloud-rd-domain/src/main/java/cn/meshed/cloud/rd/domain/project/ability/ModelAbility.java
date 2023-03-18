@@ -1,5 +1,8 @@
 package cn.meshed.cloud.rd.domain.project.ability;
 
+import cn.meshed.cloud.core.IDetails;
+import cn.meshed.cloud.core.IPageList;
+import cn.meshed.cloud.core.ISave;
 import cn.meshed.cloud.rd.project.command.ModelCmd;
 import cn.meshed.cloud.rd.project.data.ModelDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
@@ -19,30 +22,9 @@ import java.util.Set;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface ModelAbility {
+public interface ModelAbility extends IPageList<ModelPageQry, PageResponse<ModelDTO>>,
+        IDetails<String, SingleResponse<ModelDetailDTO>>, ISave<ModelCmd, Response> {
 
-    /**
-     * 列表
-     *
-     * @param modelPageQry 模型分页查询
-     * @return {@link PageResponse < ModelDTO >}
-     */
-    PageResponse<ModelDTO> list(ModelPageQry modelPageQry);
-
-    /**
-     * 详情
-     *
-     * @return {@link SingleResponse < ModelDetailDTO >}
-     */
-    SingleResponse<ModelDetailDTO> details(String uuid);
-
-    /**
-     * 保存功能
-     *
-     * @param modelCmd 服务数据
-     * @return {@link Response}
-     */
-    Response save(ModelCmd modelCmd);
 
     /**
      * 可用模型唯一标识
