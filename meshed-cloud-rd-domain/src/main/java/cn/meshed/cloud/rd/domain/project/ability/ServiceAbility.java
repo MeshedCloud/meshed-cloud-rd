@@ -1,5 +1,8 @@
 package cn.meshed.cloud.rd.domain.project.ability;
 
+import cn.meshed.cloud.core.IDetails;
+import cn.meshed.cloud.core.IPageList;
+import cn.meshed.cloud.core.ISave;
 import cn.meshed.cloud.rd.project.command.ServiceCmd;
 import cn.meshed.cloud.rd.project.data.ServiceDTO;
 import cn.meshed.cloud.rd.project.data.ServiceDetailDTO;
@@ -18,30 +21,8 @@ import javax.validation.Valid;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface ServiceAbility {
-
-    /**
-     * 列表
-     *
-     * @param servicePageQry
-     * @return {@link PageResponse < ServiceDTO >}
-     */
-    PageResponse<ServiceDTO> list(ServicePageQry servicePageQry);
-
-    /**
-     * 详情
-     *
-     * @return {@link SingleResponse < ServiceDetailDTO >}
-     */
-    SingleResponse<ServiceDetailDTO> details(String uuid);
-
-    /**
-     * 保存功能
-     *
-     * @param serviceCmd 服务数据
-     * @return {@link Response}
-     */
-    Response save(ServiceCmd serviceCmd);
+public interface ServiceAbility extends IPageList<ServicePageQry, PageResponse<ServiceDTO>>,
+        IDetails<String, SingleResponse<ServiceDetailDTO>>, ISave<ServiceCmd, Response> {
 
     /**
      * jar统计

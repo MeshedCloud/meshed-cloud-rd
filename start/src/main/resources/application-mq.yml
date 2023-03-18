@@ -17,6 +17,11 @@ spring:
           group: warehouse
         initWarehouseMember-in-0:
           destination: warehouse-initialize
-          group: systemConfig
+          group: member
+        versionPublish:
+          destination: version-publish
+        versionPublishStrategy-in-0:
+          destination: version-publish
+          group: version
       function:
-        definition: initProjectWarehouse;initSystemConfig;initWarehouseSkeleton;initWarehouseMember
+        definition: initProjectWarehouse;initSystemConfig;initWarehouseSkeleton;initWarehouseMember;versionPublishStrategy

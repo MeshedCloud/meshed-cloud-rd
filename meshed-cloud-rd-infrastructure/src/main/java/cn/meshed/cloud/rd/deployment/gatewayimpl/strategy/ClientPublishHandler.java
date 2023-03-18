@@ -1,11 +1,12 @@
 package cn.meshed.cloud.rd.deployment.gatewayimpl.strategy;
 
 import cn.meshed.cloud.rd.domain.deployment.strategy.AsyncPublishStrategy;
+import cn.meshed.cloud.rd.domain.deployment.strategy.Publish;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishHandler;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishType;
-import cn.meshed.cloud.rd.domain.deployment.strategy.dto.ClientPublish;
 import cn.meshed.cloud.rd.domain.deployment.strategy.dto.ModelPublish;
 import cn.meshed.cloud.rd.domain.deployment.strategy.dto.ServicePublish;
+import cn.meshed.cloud.rd.domain.repo.Branch;
 import cn.meshed.cloud.rd.domain.repo.gateway.RepositoryGateway;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.CopyUtils;
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import static cn.meshed.cloud.rd.domain.common.constant.Constant.SRC_PATH;
+import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.MASTER;
+import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.WORKSPACE;
 
 /**
  * <h1></h1>
@@ -23,7 +26,7 @@ import static cn.meshed.cloud.rd.domain.common.constant.Constant.SRC_PATH;
  */
 @RequiredArgsConstructor
 @Component
-public class ClientPublishHandler implements PublishHandler<ClientPublish> {
+public class ClientPublishHandler implements PublishHandler<Publish> {
 
     private final AsyncPublishStrategy asyncPublishStrategy;
     private final RepositoryGateway repositoryGateway;
@@ -41,20 +44,23 @@ public class ClientPublishHandler implements PublishHandler<ClientPublish> {
     /**
      * 发布客户端
      *
-     * @param clientPublish 客户端发布数据包
+     * @param publish 客户端发布数据包
      */
     @Override
-    public void publish(ClientPublish clientPublish) {
-        String projectKey = clientPublish.getProjectKey();
+    public void publish(Publish publish) {
+        String projectKey = publish.getProjectKey();
         AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目key不允许为空");
-        repositoryGateway.rebuildBranch(clientPublish.getRepositoryId(), clientPublish.getBranch());
+        Branch branch = new Branch(WORKSPACE, MASTER);
+        repositoryGateway.rebuildBranch(publish.getSourceId(), branch);
         //发布模型
-        ModelPublish modelPublish = CopyUtils.copy(clientPublish, ModelPublish.class);
+        ModelPublish modelPublish = CopyUtils.copy(publish, ModelPublish.class);
         modelPublish.setBasePath(SRC_PATH);
+        modelPublish.setBranch(branch);
         asyncPublishStrategy.asyncPublish(PublishType.MODEL, modelPublish);
         //发布服务
-        ServicePublish servicePublish = CopyUtils.copy(clientPublish, ServicePublish.class);
+        ServicePublish servicePublish = CopyUtils.copy(publish, ServicePublish.class);
         servicePublish.setBasePath(SRC_PATH);
+        servicePublish.setBranch(branch);
         asyncPublishStrategy.asyncPublish(PublishType.SERVICE, servicePublish);
         //发布枚举。。。
 

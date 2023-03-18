@@ -43,7 +43,7 @@ public class ModelAbilityImpl implements ModelAbility {
      * @return {@link PageResponse < ModelDTO >}
      */
     @Override
-    public PageResponse<ModelDTO> list(ModelPageQry modelPageQry) {
+    public PageResponse<ModelDTO> searchPageList(ModelPageQry modelPageQry) {
         return modelPageQryExe.execute(modelPageQry);
     }
 

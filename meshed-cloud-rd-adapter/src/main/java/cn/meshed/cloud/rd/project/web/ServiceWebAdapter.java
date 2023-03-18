@@ -38,7 +38,7 @@ public class ServiceWebAdapter implements ServiceAdapter {
     @Override
     public PageResponse<ServiceDTO> list(String projectKey, @Valid ServicePageQry servicePageQry) {
         servicePageQry.setProjectKey(projectKey);
-        return serviceAbility.list(servicePageQry);
+        return serviceAbility.searchPageList(servicePageQry);
     }
 
     /**

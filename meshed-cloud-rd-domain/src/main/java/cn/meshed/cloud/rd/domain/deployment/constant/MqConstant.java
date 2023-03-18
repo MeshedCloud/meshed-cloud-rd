@@ -9,4 +9,5 @@ package cn.meshed.cloud.rd.domain.deployment.constant;
 public interface MqConstant {
 
     String WAREHOUSE_INITIALIZE = "warehouseInitialize";
+    String VERSION_PUBLISH = "versionPublish";
 }

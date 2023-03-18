@@ -2,6 +2,9 @@ package cn.meshed.cloud.rd.deployment.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
 import cn.meshed.cloud.rd.deployment.command.WarehouseAddCmd;
+import cn.meshed.cloud.rd.deployment.enums.WarehouseOperateEnum;
+import cn.meshed.cloud.rd.deployment.enums.WarehouseRelationEnum;
+import cn.meshed.cloud.rd.deployment.enums.WarehouseRepoTypeEnum;
 import cn.meshed.cloud.rd.deployment.event.WarehouseInitializeEvent;
 import cn.meshed.cloud.rd.domain.deployment.Warehouse;
 import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
@@ -63,14 +66,19 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
             Project project = checkWarehouseParamWithGetProject(warehouseAddCmd);
             //构建实体仓库
             Repository repository = getRepositoryWithBuild(warehouseAddCmd, project);
-            initBranch(repository.getRepositoryId());
+
             //创建逻辑仓库
             Warehouse warehouse = warehouseGateway.save(buildWarehouse(warehouseAddCmd, project, repository));
-            //判断是否根据模板创建
-            if (StringUtils.isNotBlank(warehouseAddCmd.getEngineTemplate())) {
-                //发布构建事件
-                publishBuild(warehouseAddCmd.getEngineTemplate(), warehouse, repository, project);
+            //新建需要直接初始化
+            if (warehouseAddCmd.getOperate() == WarehouseOperateEnum.NEW) {
+                //判断是否根据模板创建
+                if (StringUtils.isNotBlank(warehouseAddCmd.getEngineTemplate())) {
+                    //发布构建事件
+                    publishBuild(warehouseAddCmd.getEngineTemplate(), warehouse, repository, project);
+                }
             }
+            //后续处理导入的分支业务
+            initBranch(repository.getRepositoryId());
             //返回仓库信息
             return ResultUtils.of(warehouse);
         } catch (SysException sysException) {
@@ -93,9 +101,8 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
         commitRepositoryFile.setRepositoryId(repositoryId);
         commitRepositoryFile.setCommitMessage("init");
         commitRepositoryFile.setBranchName(MASTER);
-        commitRepositoryFile.setFiles(Collections.singletonList(new RepositoryFile("README.md", "# Meshed Cloud")));
-        Integer commitCount = repositoryGateway.commitRepositoryFile(commitRepositoryFile);
-        return commitCount;
+        commitRepositoryFile.setFiles(Collections.singletonList(new RepositoryFile("MeshedCloud.md", "# Meshed Cloud")));
+        return repositoryGateway.commitRepositoryFile(commitRepositoryFile);
     }
 
     /**
@@ -137,6 +144,15 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
         warehouse.setRepoUrl(repository.getRepoUrl());
         warehouse.setName(warehouseAddCmd.getName());
         warehouse.setRepoId(repository.getRepositoryId());
+        if (warehouseAddCmd.getOperate() == WarehouseOperateEnum.IMPORT) {
+            for (WarehouseRepoTypeEnum warehouseRepoType : WarehouseRepoTypeEnum.values()) {
+                if (warehouseAddCmd.getRepoUrl().contains(warehouseRepoType.getKey())) {
+                    warehouse.setRepoType(warehouseRepoType);
+                    break;
+                }
+            }
+            warehouse.setRelation(WarehouseRelationEnum.IMPORT);
+        }
         return warehouse;
     }
 
@@ -157,6 +173,8 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
         createRepository.setNamespaceId(project.getThirdId());
         createRepository.setDescription(warehouseAddCmd.getName(), warehouseAddCmd.getDescription());
         createRepository.setRepositoryName(warehouseAddCmd.getRepoName());
+        createRepository.setImportUrl(warehouseAddCmd.getRepoUrl());
+        createRepository.setImportToken(warehouseAddCmd.getAccessToken());
         return repositoryGateway.createRepository(createRepository);
     }
 
