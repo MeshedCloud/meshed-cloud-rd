@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 public class VersionGatewayImpl implements VersionGateway {
 
     private final VersionMapper versionMapper;
+
     /**
      * <h1>分页搜索</h1>
      *
