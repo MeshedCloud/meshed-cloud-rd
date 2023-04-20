@@ -88,7 +88,7 @@ public class ServiceGroup implements Serializable {
     }
 
     public void initServiceGroup(String groupKey, String basePackage) {
-        this.className = StrUtil.upperFirst(groupKey) + this.type.getKey();
+        this.className = StrUtil.upperFirst(groupKey) + this.type.getExt();
         if (ServiceTypeEnum.RPC == this.type) {
             this.uri = this.className;
         }

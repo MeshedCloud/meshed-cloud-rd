@@ -25,6 +25,10 @@ public enum PublishType {
      * 模型 (子维度)
      */
     MODEL,
+    /**
+     * 枚举 (子维度)
+     */
+    ENUM,
 
     /**
      * 事件 (子维度)

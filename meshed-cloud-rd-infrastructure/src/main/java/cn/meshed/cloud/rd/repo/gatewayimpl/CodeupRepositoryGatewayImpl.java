@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.repo.gatewayimpl;
 
 import cn.hutool.http.HttpStatus;
+import cn.meshed.cloud.rd.domain.repo.AddRepositoryMember;
 import cn.meshed.cloud.rd.domain.repo.Branch;
 import cn.meshed.cloud.rd.domain.repo.CommitRepositoryFile;
 import cn.meshed.cloud.rd.domain.repo.CreateRepository;
@@ -16,6 +17,7 @@ import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.CopyUtils;
 import com.alibaba.cola.exception.SysException;
 import com.aliyun.devops20210625.Client;
+import com.aliyun.devops20210625.models.AddGroupMemberRequest;
 import com.aliyun.devops20210625.models.CreateBranchRequest;
 import com.aliyun.devops20210625.models.CreateBranchResponse;
 import com.aliyun.devops20210625.models.CreateFileRequest;
@@ -27,6 +29,7 @@ import com.aliyun.devops20210625.models.CreateRepositoryRequest;
 import com.aliyun.devops20210625.models.CreateRepositoryResponse;
 import com.aliyun.devops20210625.models.CreateRepositoryResponseBody;
 import com.aliyun.devops20210625.models.DeleteBranchRequest;
+import com.aliyun.devops20210625.models.DeleteGroupMemberRequest;
 import com.aliyun.devops20210625.models.GetRepositoryRequest;
 import com.aliyun.devops20210625.models.GetRepositoryResponse;
 import com.aliyun.devops20210625.models.GetRepositoryResponseBody;
@@ -301,6 +304,56 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
             client.deleteBranch(repositoryId, deleteBranchRequest);
         } catch (Exception e) {
             log.error("{} delete branch fail : {} ", branch, e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 添加代码组成员
+     *
+     * @param repositoryId        仓库ID
+     * @param addRepositoryMember 添加仓库成员
+     * @return 成功与否
+     */
+    @Override
+    public boolean addGroupMember(String repositoryId, AddRepositoryMember addRepositoryMember) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
+        AssertUtils.isTrue(StringUtils.isNotBlank(addRepositoryMember.getRepoUid()), "仓库用户ID不能为空");
+        AssertUtils.isTrue(addRepositoryMember.getAccessLevel() != null, "项目等级不能为空");
+
+        AddGroupMemberRequest addGroupMemberRequest = new AddGroupMemberRequest();
+        addGroupMemberRequest.setOrganizationId(organizationId);
+        addGroupMemberRequest.setAliyunPks(addRepositoryMember.getRepoUid());
+        addGroupMemberRequest.setAccessLevel(addGroupMemberRequest.accessLevel);
+        try {
+            client.addGroupMember(repositoryId, addGroupMemberRequest);
+        } catch (Exception e) {
+            log.error("{} add group member fail : {} ", addRepositoryMember, e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 删除代码组成员
+     *
+     * @param repositoryId 仓库ID
+     * @param repoUid      仓库用户ID
+     * @return 成功与否
+     */
+    @Override
+    public boolean deleteGroupMember(String repositoryId, String repoUid) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
+        AssertUtils.isTrue(StringUtils.isNotBlank(repoUid), "仓库用户ID不能为空");
+
+        DeleteGroupMemberRequest deleteGroupMemberRequest = new DeleteGroupMemberRequest();
+        deleteGroupMemberRequest.setOrganizationId(organizationId);
+        deleteGroupMemberRequest.setAliyunPk(repoUid);
+        try {
+            client.deleteGroupMember(repositoryId, deleteGroupMemberRequest);
+        } catch (Exception e) {
+            log.error("{} delete group member fail : {} ", repoUid, e.getMessage());
             return false;
         }
         return true;

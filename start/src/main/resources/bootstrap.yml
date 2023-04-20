@@ -41,13 +41,18 @@ spring:
           group: DEFAULT_GROUP   # 默认为DEFAULT_GROUP
           refresh: true   # 是否动态刷新，默认为false
         shared-configs[2]:
-          data-id: rd-codegen.yaml # 配置文件名-Data Id
+          data-id: dubbo.yaml # 配置文件名-Data Id
           group: DEFAULT_GROUP   # 默认为DEFAULT_GROUP
           refresh: true   # 是否动态刷新，默认为false
         shared-configs[3]:
+          data-id: rd-codegen.yaml # 配置文件名-Data Id
+          group: DEFAULT_GROUP   # 默认为DEFAULT_GROUP
+          refresh: true   # 是否动态刷新，默认为false
+        shared-configs[4]:
           data-id: mq.yaml # 配置文件名-Data Id
           group: DEFAULT_GROUP   # 默认为DEFAULT_GROUP
           refresh: true   # 是否动态刷新，默认为false
+
         # 扩展配置
   #        extension-configs[0]:
   #          data-id: file.yaml

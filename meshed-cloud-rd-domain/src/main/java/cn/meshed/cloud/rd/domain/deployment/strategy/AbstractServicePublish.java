@@ -56,7 +56,7 @@ public abstract class AbstractServicePublish {
         objectField.setExplain(field.getExplain());
         objectField.setExample(field.getMock());
         if (field.getGeneric() != null && field.getGeneric() != BaseGenericsEnum.NONE) {
-            objectField.setGeneric(field.getGeneric().getKey());
+            objectField.setGeneric(field.getGeneric().getExt());
         }
         objectField.setAnnotationJson(field.getRule());
         objectField.setNonNull(field.getNonNull());
@@ -190,7 +190,7 @@ public abstract class AbstractServicePublish {
             Field field = responses.iterator().next();
             //存在业务泛型设置，分页不建议使用泛型，但是不限制业务
             if (field.getGeneric() != BaseGenericsEnum.NONE) {
-                objectResponse.setSubGeneric(field.getGeneric().getKey());
+                objectResponse.setSubGeneric(field.getGeneric().getExt());
             }
             //设置类型
             objectResponse.setDataType(field.getFieldType());

@@ -56,6 +56,11 @@
             <artifactId>maven-resolver-transport-http</artifactId>
             <version>1.4.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>ram20150501</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 
     </dependencies>
 </project>

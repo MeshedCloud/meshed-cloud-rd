@@ -16,3 +16,14 @@ VM 参数
 ## swagger Doc
 
 > http://localhost:9998/rd/doc.html
+>
+
+## 部署
+
+### Docker
+
+```shell
+docker login --username=meshed registry.cn-shanghai.aliyuncs.com
+docker pull registry.cn-shanghai.aliyuncs.com/meshed/rd:[最新版本号]
+docker run -d -e JAVA_OPTS='-DPORT=9998 -DDUBBO_IP_TO_REGISTRY=public-ip -DACTIVE=prod -DNACOS_HOST=nacos-ip -DNACOS_PORT=nacos-port' --net=host registry.cn-shanghai.aliyuncs.com/meshed/rd:[最新版本号]
+```

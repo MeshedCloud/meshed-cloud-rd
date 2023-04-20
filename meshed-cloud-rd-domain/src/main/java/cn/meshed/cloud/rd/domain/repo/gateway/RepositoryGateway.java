@@ -1,5 +1,6 @@
 package cn.meshed.cloud.rd.domain.repo.gateway;
 
+import cn.meshed.cloud.rd.domain.repo.AddRepositoryMember;
 import cn.meshed.cloud.rd.domain.repo.Branch;
 import cn.meshed.cloud.rd.domain.repo.CommitRepositoryFile;
 import cn.meshed.cloud.rd.domain.repo.CreateRepository;
@@ -87,4 +88,22 @@ public interface RepositoryGateway {
      * @return 成功与否
      */
     boolean deleteBranch(String repositoryId, String branch);
+
+    /**
+     * 添加代码组成员
+     *
+     * @param repositoryId        仓库ID
+     * @param addRepositoryMember 添加仓库成员
+     * @return 成功与否
+     */
+    boolean addGroupMember(String repositoryId, AddRepositoryMember addRepositoryMember);
+
+    /**
+     * 删除代码组成员
+     *
+     * @param repositoryId 仓库ID
+     * @param repoUid      仓库用户ID
+     * @return 成功与否
+     */
+    boolean deleteGroupMember(String repositoryId, String repoUid);
 }

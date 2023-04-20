@@ -59,7 +59,6 @@ public class AdapterPublishHandler extends AbstractServicePublish implements Pub
         Set<ServiceGroup> serviceGroups = servicePublish.getServiceGroups();
         //转换为适配器
         Set<Adapter> adapters = serviceGroups.stream().map(this::toAdapter).collect(Collectors.toSet());
-
         //新增接口
         getCliGateway().asyncGenerateAdapterWithPush(servicePublish.getSourceId(),
                 buildGenerateAdapter(servicePublish, adapters));

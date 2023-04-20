@@ -109,7 +109,7 @@ public class ProjectGatewayImpl implements ProjectGateway {
         } else if (ProjectVisitTypeEnum.MEMBER == visitType) {
             //todo 查询成员仓库
         } else if (ProjectVisitTypeEnum.OWNER == visitType) {
-            lqw.eq(ProjectDO::getOwnerId, SecurityContext.getOperatorUserId());
+            lqw.eq(ProjectDO::getOwnerId, SecurityContext.getUserId());
         }
     }
 }

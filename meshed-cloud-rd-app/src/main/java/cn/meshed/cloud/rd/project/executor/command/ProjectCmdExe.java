@@ -14,6 +14,8 @@ import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -48,25 +50,48 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
      */
     @Override
     public Response execute(ProjectCmd projectCmd) {
+        //构建项目信息
+        Project project = buildProject(projectCmd);
+        //保存项目信息
+        Project saveProject = projectGateway.save(project);
+        if (saveProject == null) {
+            return ResultUtils.fail("发起立项失败");
+        }
+        //生成初始化事件信息
+        ProjectInitializeEvent event = buildProjectInitializeEvent(projectCmd);
+        //走审批流
+        if (approveEnable) {
+            initiateApproval(event);
+        } else {
+            //发起初始化事件
+            streamBridgeSender.send(PROJECT_INITIALIZE, event);
+        }
+        return ResultUtils.ok();
+    }
+
+    @Nullable
+    private ProjectInitializeEvent buildProjectInitializeEvent(ProjectCmd projectCmd) {
+        ProjectInitializeEvent event = CopyUtils.copy(projectCmd, ProjectInitializeEvent.class);
+        return event;
+    }
+
+    @NotNull
+    private Project buildProject(ProjectCmd projectCmd) {
         Project project = CopyUtils.copy(projectCmd, Project.class);
         project.initProject();
         RepositoryGroup repositoryGroup = buildGroup(projectCmd);
         project.setThirdId(repositoryGroup.getGroupId());
         project.setIdentity(repositoryGroup.getGroupName());
-        Project saveProject = projectGateway.save(project);
-        if (saveProject == null) {
-            return ResultUtils.fail("发起立项失败");
-        }
-        ProjectInitializeEvent event = CopyUtils.copy(projectCmd, ProjectInitializeEvent.class);
-        //走审批流
-        if (approveEnable) {
+        return project;
+    }
 
-        } else {
-            //发起初始化事件
-            streamBridgeSender.send(PROJECT_INITIALIZE, event);
-        }
+    /**
+     * todo 发起审批
+     *
+     * @param event
+     */
+    private void initiateApproval(ProjectInitializeEvent event) {
 
-        return ResultUtils.ok();
     }
 
     private RepositoryGroup buildGroup(ProjectCmd projectCmd) {

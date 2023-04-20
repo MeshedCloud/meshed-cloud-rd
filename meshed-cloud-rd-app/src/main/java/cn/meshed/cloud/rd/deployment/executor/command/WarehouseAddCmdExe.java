@@ -146,7 +146,7 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
         warehouse.setRepoId(repository.getRepositoryId());
         if (warehouseAddCmd.getOperate() == WarehouseOperateEnum.IMPORT) {
             for (WarehouseRepoTypeEnum warehouseRepoType : WarehouseRepoTypeEnum.values()) {
-                if (warehouseAddCmd.getRepoUrl().contains(warehouseRepoType.getKey())) {
+                if (warehouseAddCmd.getRepoUrl().contains(warehouseRepoType.getExt())) {
                     warehouse.setRepoType(warehouseRepoType);
                     break;
                 }

@@ -2,6 +2,7 @@ package cn.meshed.cloud.rd.domain.cli.gateway;
 
 import cn.meshed.cloud.rd.domain.cli.BuildArchetype;
 import cn.meshed.cloud.rd.domain.cli.GenerateAdapter;
+import cn.meshed.cloud.rd.domain.cli.GenerateEnum;
 import cn.meshed.cloud.rd.domain.cli.GenerateModel;
 import cn.meshed.cloud.rd.domain.cli.GenerateRpc;
 import com.alibaba.cola.exception.SysException;
@@ -40,6 +41,14 @@ public interface CliGateway {
      * @param generateModel 生成模型
      */
     void asyncGenerateModelWithPush(String repositoryId, GenerateModel generateModel);
+
+    /**
+     * 异步生成枚举并推送
+     *
+     * @param repositoryId 仓库ID
+     * @param generateEnum 生成枚举
+     */
+    void asyncGenerateEnumWithPush(String repositoryId, GenerateEnum generateEnum);
 
     /**
      * 异步生成服务并推送

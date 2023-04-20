@@ -40,6 +40,11 @@
             <groupId>cn.meshed.cloud</groupId>
             <artifactId>meshed-cloud-stream-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.meshed.cloud.iam</groupId>
+            <artifactId>meshed-cloud-iam-client</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 </project>

@@ -7,6 +7,7 @@ import cn.meshed.cloud.rd.deployment.enums.WarehouseRepoTypeEnum;
 import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
 import cn.meshed.cloud.rd.domain.deployment.gateway.param.WarehouseSelectParam;
 import cn.meshed.cloud.utils.ResultUtils;
+import com.alibaba.cola.dto.MultiResponse;
 import com.alibaba.cola.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Component
-public class WarehouseSelectQryExe implements QueryExecute<String, SingleResponse<List<WarehouseSelectDTO>>> {
+public class WarehouseSelectQryExe implements QueryExecute<String, MultiResponse<WarehouseSelectDTO>> {
 
     private final WarehouseGateway warehouseGateway;
 
@@ -33,11 +34,11 @@ public class WarehouseSelectQryExe implements QueryExecute<String, SingleRespons
      * @return {@link SingleResponse<List<WarehouseSelectDTO>>}
      */
     @Override
-    public SingleResponse<List<WarehouseSelectDTO>> execute(String projectKey) {
+    public MultiResponse<WarehouseSelectDTO> execute(String projectKey) {
         WarehouseSelectParam warehouseSelectParam = new WarehouseSelectParam();
         warehouseSelectParam.setProjectKey(projectKey);
         warehouseSelectParam.setRepoType(WarehouseRepoTypeEnum.CODEUP);
         warehouseSelectParam.setPurposeTypes(Arrays.asList(WarehousePurposeTypeEnum.CLIENT, WarehousePurposeTypeEnum.ASSEMBLY));
-        return ResultUtils.copyList(warehouseGateway.select(warehouseSelectParam), WarehouseSelectDTO::new);
+        return ResultUtils.copyMulti(warehouseGateway.select(warehouseSelectParam), WarehouseSelectDTO::new);
     }
 }

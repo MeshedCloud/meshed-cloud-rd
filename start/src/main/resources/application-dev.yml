@@ -1,0 +1,7 @@
+service:
+  mock:
+    enable: true
+    user-id: 1
+    username: name
+    access: 6
+    roles: 6

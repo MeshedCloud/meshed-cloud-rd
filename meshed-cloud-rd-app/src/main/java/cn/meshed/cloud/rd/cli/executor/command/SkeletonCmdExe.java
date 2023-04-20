@@ -44,20 +44,16 @@ public class SkeletonCmdExe implements CommandExecute<Skeleton, SingleResponse<S
     public SingleResponse<String> execute(Skeleton skeleton) {
         //校验
         skeleton.verification();
-
         //获取原型模板
         Archetype archetype = archetypeTemplateQry.execute(skeleton.getEngineTemplate());
         if (archetype == null) {
             return ResultUtils.fail("模板不存在");
         }
-
         Artifact artifact = new Artifact(skeleton.getBasePackage(), skeleton.getRepositoryName(), true);
         artifact.addExtended("domain", "examples");
         artifact.addExtended("projectKey", skeleton.getProjectKey());
-
-
         try {
-
+            //构建原型并推送到物理仓库
             String branch = cliGateway.archetypeWithPush(skeleton.getRepositoryId(),
                     new BuildArchetype(archetype, artifact, new Branch(WORKSPACE, MASTER)));
             if (StringUtils.isNotBlank(branch)) {

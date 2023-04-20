@@ -5,7 +5,6 @@ import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -23,13 +22,11 @@ public class AsyncPublishStrategy implements BeanPostProcessor {
 
     private static final Map<PublishType, PublishHandler<Publish>> PUBLISH_HANDLER_MAP = new EnumMap<>(PublishType.class);
 
-    private ApplicationContext applicationContext;
-
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (!(bean instanceof PublishHandler)) {
             return bean;
-        }
+        } //非发布策略注入拦截
         PublishHandler<Publish> handler = (PublishHandler) bean;
         PUBLISH_HANDLER_MAP.put(handler.getPublishType(), handler);
         return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
@@ -47,7 +44,7 @@ public class AsyncPublishStrategy implements BeanPostProcessor {
         PublishHandler<Publish> publishHandler = PUBLISH_HANDLER_MAP.get(publishType);
         if (publishHandler == null) {
             return ResultUtils.fail("策略未被实现");
-        }
+        } //不存在拦截： 策略未被实现
         publishHandler.publish(publish);
         return ResultUtils.ok();
     }

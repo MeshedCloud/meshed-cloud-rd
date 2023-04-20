@@ -6,6 +6,8 @@ import cn.meshed.cloud.rd.domain.cli.Archetype;
 import cn.meshed.cloud.rd.domain.cli.Artifact;
 import cn.meshed.cloud.rd.domain.cli.BuildArchetype;
 import cn.meshed.cloud.rd.domain.cli.GenerateAdapter;
+import cn.meshed.cloud.rd.domain.cli.GenerateCode;
+import cn.meshed.cloud.rd.domain.cli.GenerateEnum;
 import cn.meshed.cloud.rd.domain.cli.GenerateModel;
 import cn.meshed.cloud.rd.domain.cli.GenerateRpc;
 import cn.meshed.cloud.rd.domain.cli.gateway.CliGateway;
@@ -124,14 +126,11 @@ public class CliGatewayImpl implements CliGateway {
      */
     @Override
     public String archetypeWithPush(String repositoryId, BuildArchetype buildArchetype) throws SysException {
-
         AssertUtils.isTrue(buildArchetype.getBranch() != null, "分支信息不能为空");
-
         //重建工作分支，避免已存在
         repositoryGateway.rebuildBranch(repositoryId, buildArchetype.getBranch());
         //构建原型
         String workspacePath = buildArchetype(buildArchetype);
-
         AssertUtils.isTrue(StringUtils.isNotBlank(workspacePath), "生成失败");
         String projectPath = workspacePath + "/" + buildArchetype.getArtifact().getArtifactId();
         //读取上传文件信息
@@ -180,11 +179,9 @@ public class CliGatewayImpl implements CliGateway {
     @Async
     @Override
     public void asyncGenerateModelWithPush(String repositoryId, GenerateModel generateModel) {
-        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
-        AssertUtils.isTrue(generateModel != null, "构建参数不能为空");
-        assert generateModel != null;
+        check(repositoryId, generateModel);
         AssertUtils.isTrue(CollectionUtils.isNotEmpty(generateModel.getModels()), "构建模型不能为空");
-        AssertUtils.isTrue(generateModel.getBranch() != null, "构建分支不能为空");
+
         //构建代码并转换数据
         List<RepositoryFile> repositoryFiles = generateModel.getModels().stream().filter(Objects::nonNull).map(model -> {
             String code = generateClassExecute.buildModel(model);
@@ -196,6 +193,27 @@ public class CliGatewayImpl implements CliGateway {
     }
 
     /**
+     * 异步生成枚举并推送
+     *
+     * @param repositoryId 仓库ID
+     * @param generateEnum 生成枚举
+     */
+    @Override
+    public void asyncGenerateEnumWithPush(String repositoryId, GenerateEnum generateEnum) {
+        check(repositoryId, generateEnum);
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(generateEnum.getEnums()), "构建模型不能为空");
+
+        //构建代码并转换数据
+        List<RepositoryFile> repositoryFiles = generateEnum.getEnums().stream().filter(Objects::nonNull).map(objectEnum -> {
+            String code = generateClassExecute.buildEnum(objectEnum);
+            String path = GenerateUtils.packageToPath(generateEnum.getBasePath(), objectEnum.getPackageName());
+            return new RepositoryFile(path, code);
+        }).collect(Collectors.toList());
+        //提交
+        commitFiles(repositoryId, repositoryFiles, generateEnum.getCommitMessage(), generateEnum.getBranch());
+    }
+
+    /**
      * 异步生成服务并推送
      *
      * @param repositoryId    仓库ID
@@ -204,11 +222,9 @@ public class CliGatewayImpl implements CliGateway {
     @Async
     @Override
     public void asyncGenerateAdapterWithPush(String repositoryId, GenerateAdapter generateAdapter) {
-        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
-        AssertUtils.isTrue(generateAdapter != null, "构建参数不能为空");
-        assert generateAdapter != null;
+        check(repositoryId, generateAdapter);
         AssertUtils.isTrue(CollectionUtils.isNotEmpty(generateAdapter.getAdapters()), "构建适配器不能为空");
-        AssertUtils.isTrue(generateAdapter.getBranch() != null, "构建分支不能为空");
+
         //构建代码并转换数据
         List<RepositoryFile> repositoryFiles = generateAdapter.getAdapters().stream().filter(Objects::nonNull).map(adapter -> {
             String code = generateClassExecute.buildAdapter(adapter);
@@ -227,11 +243,8 @@ public class CliGatewayImpl implements CliGateway {
      */
     @Override
     public void asyncGenerateRpcWithPush(String repositoryId, GenerateRpc generateRpc) {
-        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
-        AssertUtils.isTrue(generateRpc != null, "构建参数不能为空");
-        assert generateRpc != null;
+        check(repositoryId, generateRpc);
         AssertUtils.isTrue(CollectionUtils.isNotEmpty(generateRpc.getRpcList()), "构建RPC不能为空");
-        AssertUtils.isTrue(generateRpc.getBranch() != null, "构建分支不能为空");
         //构建代码并转换数据
         List<RepositoryFile> repositoryFiles = generateRpc.getRpcList().stream().filter(Objects::nonNull).map(rpc -> {
             String code = generateClassExecute.buildRpc(rpc);
@@ -240,6 +253,19 @@ public class CliGatewayImpl implements CliGateway {
         }).collect(Collectors.toList());
         //提交
         commitFiles(repositoryId, repositoryFiles, generateRpc.getCommitMessage(), generateRpc.getBranch());
+    }
+
+    /**
+     * 检查参数
+     *
+     * @param repositoryId 仓库id
+     * @param generateCode 通用生成
+     */
+    private void check(String repositoryId, GenerateCode generateCode) {
+        AssertUtils.isTrue(generateCode != null, "构建参数不能为空");
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
+        assert generateCode != null;
+        AssertUtils.isTrue(generateCode.getBranch() != null, "构建分支不能为空");
     }
 
     /**

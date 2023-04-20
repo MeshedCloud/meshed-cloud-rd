@@ -155,7 +155,7 @@ public class Service implements Serializable {
         this.releaseStatus = ReleaseStatusEnum.EDIT;
         this.status = ServiceModelStatusEnum.DEV;
         this.version = INIT_VERSION;
-        this.ownerId = SecurityContext.getOperatorUserId();
+        this.ownerId = SecurityContext.getUserId();
         if (ServiceTypeEnum.RPC == this.type) {
             this.uri = this.method;
             this.requestType = RequestTypeEnum.RPC;
@@ -206,7 +206,7 @@ public class Service implements Serializable {
             model.setSuperClass(DTO);
         }
         String classNamePrefix = StrUtil.upperFirst(
-                this.className.replaceAll(this.type.getKey(), "")
+                this.className.replaceAll(this.type.getExt(), "")
         );
         model.initModel(classNamePrefix + StrUtil.upperFirst(this.method));
 
@@ -271,7 +271,7 @@ public class Service implements Serializable {
         model.setType(getModelTypeEnum("RESPONSE"));
         model.setSuperClass(DTO);
         String classNamePrefix = StrUtil.upperFirst(
-                this.className.replaceAll(this.type.getKey(), "")
+                this.className.replaceAll(this.type.getExt(), "")
         );
         model.initModel(classNamePrefix + StrUtil.upperFirst(this.method));
         //组装成字段

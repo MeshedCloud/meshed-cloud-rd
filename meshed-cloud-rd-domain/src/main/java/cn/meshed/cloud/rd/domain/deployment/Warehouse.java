@@ -104,7 +104,7 @@ public class Warehouse implements Serializable {
         warehouse.setName(name);
         warehouse.setProjectKey(project.getKey());
         warehouse.setDescription(description);
-        warehouse.setOwnerId(SecurityContext.getOperatorUserId());
+        warehouse.setOwnerId(SecurityContext.getUserId());
         warehouse.setRelation(WarehouseRelationEnum.IMPORT);
         warehouse.setPurposeType(purposeType);
         warehouse.setRepoUrl(repoUrl);
@@ -129,7 +129,7 @@ public class Warehouse implements Serializable {
             return null;
         }
         for (WarehouseRepoTypeEnum repoTypeEnum : WarehouseRepoTypeEnum.values()) {
-            if (repoUrl.contains(repoTypeEnum.getKey())) {
+            if (repoUrl.contains(repoTypeEnum.getExt())) {
                 return repoTypeEnum;
             }
         }
@@ -155,7 +155,7 @@ public class Warehouse implements Serializable {
         this.status = WarehouseStatusEnum.INIT;
         this.accessMode = convertorAccessMode(accessMode);
         this.repoType = WarehouseRepoTypeEnum.CODEUP;
-        this.ownerId = SecurityContext.getOperatorUserId();
+        this.ownerId = SecurityContext.getUserId();
         this.relation = WarehouseRelationEnum.BUILD;
         this.version = INIT_VERSION;
 

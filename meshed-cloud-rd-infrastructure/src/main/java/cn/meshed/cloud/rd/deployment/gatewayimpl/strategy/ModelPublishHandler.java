@@ -52,7 +52,7 @@ public class ModelPublishHandler extends AbstractServicePublish implements Publi
     public void publish(ModelPublish modelPublish) {
         String projectKey = modelPublish.getProjectKey();
         AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目key不允许为空");
-        Set<Model> models = getModelGateway().waitPublishListByProject(projectKey);
+        Set<Model> models = getModelGateway().waitPublishModelListByProject(projectKey);
         if (CollectionUtils.isNotEmpty(models)) {
             publishModel(modelPublish, models);
         }

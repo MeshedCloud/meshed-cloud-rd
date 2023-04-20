@@ -34,7 +34,7 @@ public class ModelAvailableKeyQryExe implements QueryExecute<ModelAvailableKeyQr
         AssertUtils.isTrue(StringUtils.isNotBlank(modelAvailableKeyQry.getKey()), "模型标识不能为空");
         AssertUtils.isTrue(modelAvailableKeyQry.getType() != null, "标识不能为空");
 
-        String className = StrUtil.upperFirst(modelAvailableKeyQry.getKey()) + modelAvailableKeyQry.getType().getKey();
+        String className = StrUtil.upperFirst(modelAvailableKeyQry.getKey()) + modelAvailableKeyQry.getType().getExt();
         return ResultUtils.of(!modelGateway.existClassName(modelAvailableKeyQry.getProjectKey(), className),
                 "模型标识已经存在", ShowType.SILENT);
     }

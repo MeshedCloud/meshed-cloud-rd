@@ -36,7 +36,6 @@ public class WarehouseInitByProjectEventExe implements EventExecute<ProjectIniti
      */
     @Override
     public Void execute(ProjectInitializeEvent projectInitializeEvent) {
-        System.out.println("Project init " + projectInitializeEvent.getCodeTemplates());
         if (CollectionUtils.isNotEmpty(projectInitializeEvent.getCodeTemplates())) {
             projectInitializeEvent.getCodeTemplates().stream().filter(Objects::nonNull)
                     //查询模板

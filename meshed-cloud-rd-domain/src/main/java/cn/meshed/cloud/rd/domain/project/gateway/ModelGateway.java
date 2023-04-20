@@ -31,12 +31,20 @@ public interface ModelGateway extends ISave<Model, String>, IQuery<String, Model
     boolean existClassName(String projectKey, String className);
 
     /**
-     * 查询项目的待发布模型详情列表
+     * 查询项目的待发布模型详情列表 (不含枚举模型)
      *
      * @param projectKey 项目key
      * @return 详情列表
      */
-    Set<Model> waitPublishListByProject(String projectKey);
+    Set<Model> waitPublishModelListByProject(String projectKey);
+
+    /**
+     * 查询项目的待发布枚举详情列表
+     *
+     * @param projectKey 项目key
+     * @return 详情列表
+     */
+    Set<Model> waitPublishEnumListByProject(String projectKey);
 
     /**
      * 根据类名列表转换出包名列表

@@ -57,13 +57,12 @@ public class ClientPublishHandler implements PublishHandler<Publish> {
         modelPublish.setBasePath(SRC_PATH);
         modelPublish.setBranch(branch);
         asyncPublishStrategy.asyncPublish(PublishType.MODEL, modelPublish);
+        //发布枚举 （枚举是特殊模型，可复用模型信息）
+        asyncPublishStrategy.asyncPublish(PublishType.ENUM, modelPublish);
         //发布服务
         ServicePublish servicePublish = CopyUtils.copy(publish, ServicePublish.class);
         servicePublish.setBasePath(SRC_PATH);
         servicePublish.setBranch(branch);
         asyncPublishStrategy.asyncPublish(PublishType.SERVICE, servicePublish);
-        //发布枚举。。。
-
-
     }
 }

@@ -52,19 +52,8 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
         Version version = null;
         //区分新建和版本发布（含不同环境）
         if (versionCmd.getVersionId() == null) {
-            AssertUtils.isTrue(StringUtils.isNotBlank(versionCmd.getProjectKey()), "项目唯一标识不能为空");
             //登记版本信息
-            version = new Version();
-            version.setVersion(versionCmd.getVersion());
-            version.setEnvironment(versionCmd.getEnvironment());
-            version.setStatus(VersionStatusEnum.SUBMIT);
-            version.setProjectKey(versionCmd.getProjectKey());
-
-            Warehouse warehouse = warehouseGateway.query(versionCmd.getWarehouseId());
-            AssertUtils.isTrue(warehouse != null, "项目仓库不存在");
-            assert warehouse != null;
-            version.setSourceId(versionCmd.getWarehouseId());
-            version.setType(VersionTypeEnum.valueOf(warehouse.getPurposeType().getKey()));
+            version = buildNewVersion(versionCmd);
             versionGateway.registration(version);
         } else {
             //环境存在
@@ -74,16 +63,36 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
             //修改状态环境信息
             versionGateway.change(version);
         }
-        VersionPublishEvent versionPublishEvent = getVersionPublishEvent(versionCmd, version);
+        VersionPublishEvent event = getVersionPublishEvent(versionCmd, version);
         //如果审批流程启用发起审批，又审批进行触达构建
         if (approveEnable) {
-
+            initiateApproval(event);
         } else {
             //如果审批流程未启用直接发送构建事件
-            streamBridgeSender.send(VERSION_PUBLISH, versionPublishEvent);
+            streamBridgeSender.send(VERSION_PUBLISH, event);
         }
-
         return ResultUtils.ok();
+    }
+
+    @NotNull
+    private Version buildNewVersion(VersionCmd versionCmd) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(versionCmd.getProjectKey()), "项目唯一标识不能为空");
+        Version version;
+        version = new Version();
+        version.setVersion(versionCmd.getVersion());
+        version.setEnvironment(versionCmd.getEnvironment());
+        version.setStatus(VersionStatusEnum.SUBMIT);
+        version.setProjectKey(versionCmd.getProjectKey());
+        Warehouse warehouse = warehouseGateway.query(versionCmd.getWarehouseId());
+        AssertUtils.isTrue(warehouse != null, "项目仓库不存在");
+        assert warehouse != null;
+        version.setSourceId(versionCmd.getWarehouseId());
+        version.setType(VersionTypeEnum.valueOf(warehouse.getPurposeType().getExt()));
+        return version;
+    }
+
+    private void initiateApproval(VersionPublishEvent event) {
+
     }
 
     @NotNull

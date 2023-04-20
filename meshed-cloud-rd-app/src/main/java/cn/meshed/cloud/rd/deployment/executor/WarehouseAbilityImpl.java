@@ -8,6 +8,7 @@ import cn.meshed.cloud.rd.deployment.executor.query.WarehousePageQryExe;
 import cn.meshed.cloud.rd.deployment.executor.query.WarehouseSelectQryExe;
 import cn.meshed.cloud.rd.deployment.query.WarehousePageQry;
 import cn.meshed.cloud.rd.domain.deployment.ability.WarehouseAbility;
+import com.alibaba.cola.dto.MultiResponse;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
@@ -59,7 +60,7 @@ public class WarehouseAbilityImpl implements WarehouseAbility {
      * @return {@link SingleResponse<List<WarehouseSelectDTO>>}
      */
     @Override
-    public SingleResponse<List<WarehouseSelectDTO>> select(String projectKey) {
+    public MultiResponse<WarehouseSelectDTO> select(String projectKey) {
         return warehouseSelectQryExe.execute(projectKey);
     }
 }

@@ -99,7 +99,7 @@ public class Project implements Serializable {
         this.basePackage = buildBasePackageName();
         this.key = this.key.toUpperCase();
         this.version = INIT_VERSION;
-        this.ownerId = SecurityContext.getOperatorUserId();
+        this.ownerId = SecurityContext.getUserId();
         this.status = ProjectStatusEnum.RD;
     }
 

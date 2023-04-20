@@ -108,6 +108,10 @@ public class Model implements Serializable {
      * 相应字段列表
      */
     private Set<Field> fields;
+    /**
+     * 相应枚举信息列表，仅在枚举类型
+     */
+    private Set<EnumValue> enumValues;
 
     public void setProjectKey(String projectKey) {
         AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目唯一标识不能为空");
@@ -121,11 +125,11 @@ public class Model implements Serializable {
     }
 
     public void initModel(String classNamePrefix) {
-        this.className = StrUtil.upperFirst(classNamePrefix) + this.type.getKey();
+        this.className = StrUtil.upperFirst(classNamePrefix) + this.type.getExt();
         this.releaseStatus = ReleaseStatusEnum.EDIT;
         this.status = ServiceModelStatusEnum.DEV;
         this.version = INIT_VERSION;
-        this.ownerId = SecurityContext.getOperatorUserId();
+        this.ownerId = SecurityContext.getUserId();
     }
 
     /**

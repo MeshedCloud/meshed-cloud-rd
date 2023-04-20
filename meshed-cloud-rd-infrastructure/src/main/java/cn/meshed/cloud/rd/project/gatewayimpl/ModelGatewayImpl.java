@@ -1,12 +1,15 @@
 package cn.meshed.cloud.rd.project.gatewayimpl;
 
+import cn.meshed.cloud.rd.domain.project.EnumValue;
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Model;
 import cn.meshed.cloud.rd.domain.project.constant.RelevanceTypeEnum;
+import cn.meshed.cloud.rd.domain.project.gateway.EnumValueGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.FieldGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
 import cn.meshed.cloud.rd.project.convertor.ModelConvertor;
 import cn.meshed.cloud.rd.project.enums.ModelAccessModeEnum;
+import cn.meshed.cloud.rd.project.enums.ModelTypeEnum;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ModelDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ModelMapper;
@@ -47,6 +50,7 @@ public class ModelGatewayImpl implements ModelGateway {
 
     private final ModelMapper modelMapper;
     private final FieldGateway fieldGateway;
+    private final EnumValueGateway enumValueGateway;
 
 
     /**
@@ -93,13 +97,35 @@ public class ModelGatewayImpl implements ModelGateway {
 
         //保存字段
         String uuid = modelDO.getUuid();
-        Set<Field> fields = getFields(model, uuid);
-        if (CollectionUtils.isNotEmpty(fields)) {
-            AssertUtils.isTrue(fieldGateway.saveBatch(RelevanceTypeEnum.MODEL, fields), "字段保存失败");
+
+        /**
+         * 枚举为模型中特殊模型
+         */
+        if (ModelTypeEnum.ENUM.equals(model.getType())) {
+            Set<EnumValue> enumValues = getEnumValues(model.getEnumValues(), uuid);
+            if (CollectionUtils.isNotEmpty(enumValues)) {
+                //保存枚举值
+                enumValueGateway.saveBatch(enumValues);
+            }
+        } else {
+            Set<Field> fields = getFields(model.getFields(), uuid);
+            if (CollectionUtils.isNotEmpty(fields)) {
+                AssertUtils.isTrue(fieldGateway.saveBatch(RelevanceTypeEnum.MODEL, fields), "字段保存失败");
+            }
         }
+
 
         //返回uuid
         return uuid;
+    }
+
+    private Set<EnumValue> getEnumValues(Set<EnumValue> enumValues, String uuid) {
+        if (CollectionUtils.isEmpty(enumValues)) {
+            return enumValues;
+        }
+        return enumValues.stream()
+                .peek(enumValue -> enumValue.setMId(uuid))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -137,15 +163,18 @@ public class ModelGatewayImpl implements ModelGateway {
                         }
                         return modelFirst.getReleaseStatus() == ReleaseStatusEnum.RELEASE ? modelSecond : modelFirst;
                     })));
-            models.stream().filter(Objects::nonNull).forEach(model -> {
-                ModelDO modelDO = modelMap.get(model.getClassName());
-                //更新和模型分类
-                if (modelDO != null) {
-                    updateModels.add(ModelConvertor.toEntity(model, modelDO));
-                } else {
-                    newModels.add(ModelConvertor.toEntity(model, modelDO));
-                }
-            });
+            models.stream().filter(Objects::nonNull)
+                    //此方法不支持批量存在枚举对象
+                    .filter(model -> !ModelTypeEnum.ENUM.equals(model.getType()))
+                    .forEach(model -> {
+                        ModelDO modelDO = modelMap.get(model.getClassName());
+                        //更新和模型分类
+                        if (modelDO != null) {
+                            updateModels.add(ModelConvertor.toEntity(model, modelDO));
+                        } else {
+                            newModels.add(ModelConvertor.toEntity(model, modelDO));
+                        }
+                    });
         } else {
             //全部是新增
             newModels.addAll(CopyUtils.copySetProperties(models, ModelDO::new));
@@ -158,9 +187,7 @@ public class ModelGatewayImpl implements ModelGateway {
             modelMapper.updateBatch(updateModels);
         }
 
-        //
         //待更新字段
-
         Map<String, String> classNameUuidMap = Stream.of(newModels, updateModels)
                 .flatMap(Collection::stream).collect(Collectors.toMap(ModelDO::getClassName, ModelDO::getUuid));
         //先清理掉旧的字段，再进行新增新字段
@@ -208,11 +235,11 @@ public class ModelGatewayImpl implements ModelGateway {
     }
 
     @NotNull
-    private Set<Field> getFields(Model model, String uuid) {
-        if (CollectionUtils.isEmpty(model.getFields())) {
+    private Set<Field> getFields(Set<Field> fields, String uuid) {
+        if (CollectionUtils.isEmpty(fields)) {
             return Collections.emptySet();
         }
-        return model.getFields().stream().peek(field -> {
+        return fields.stream().peek(field -> {
             field.setRelevanceId(uuid);
             field.setRelevanceType(RelevanceTypeEnum.MODEL);
         }).collect(Collectors.toSet());
@@ -229,8 +256,16 @@ public class ModelGatewayImpl implements ModelGateway {
         if (model == null) {
             return null;
         }
-        Set<Field> fields = fieldGateway.listByModel(uuid);
-        model.setFields(fields);
+        if (ModelTypeEnum.ENUM.equals(model.getType())) {
+            //枚举查询信息
+            Set<EnumValue> enumValues = enumValueGateway.getEnumValues(model.getUuid());
+            model.setEnumValues(enumValues);
+        } else {
+            //正常模型查询字段
+            Set<Field> fields = fieldGateway.listByModel(uuid);
+            model.setFields(fields);
+        }
+
         return model;
     }
 
@@ -270,18 +305,44 @@ public class ModelGatewayImpl implements ModelGateway {
      * @return 详情列表
      */
     @Override
-    public Set<Model> waitPublishListByProject(String projectKey) {
-        AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目key不能为空");
-        LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
-        //当项目key不存在时会判断这个系统的类名唯一值
-        lqw.eq(ModelDO::getProjectKey, projectKey.toUpperCase());
-        lqw.eq(ModelDO::getReleaseStatus, ReleaseStatusEnum.PROCESSING);
-        List<ModelDO> list = modelMapper.selectList(lqw);
-        Set<Model> models = CopyUtils.copySetProperties(list, Model::new);
+    public Set<Model> waitPublishModelListByProject(String projectKey) {
+        Set<Model> models = getWaitPublishModels(projectKey, false);
         if (CollectionUtils.isEmpty(models)) {
             return models;
         }
         return assembleModelDetailsList(models);
+    }
+
+
+    /**
+     * 查询项目的待发布枚举详情列表
+     *
+     * @param projectKey 项目key
+     * @return 详情列表
+     */
+    @Override
+    public Set<Model> waitPublishEnumListByProject(String projectKey) {
+        Set<Model> models = getWaitPublishModels(projectKey, true);
+        if (CollectionUtils.isEmpty(models)) {
+            return models;
+        }
+        return assembleEnumDetailsList(models);
+    }
+
+    private Set<Model> getWaitPublishModels(String projectKey, boolean isEnum) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目key不能为空");
+        LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
+        //当项目key不存在时会判断这个系统的类名唯一值
+        //去除枚举这个特殊的
+        if (isEnum) {
+            lqw.eq(ModelDO::getType, ModelTypeEnum.ENUM);
+        } else {
+            lqw.ne(ModelDO::getType, ModelTypeEnum.ENUM);
+        }
+        lqw.eq(ModelDO::getReleaseStatus, ReleaseStatusEnum.PROCESSING)
+                .eq(ModelDO::getProjectKey, projectKey.toUpperCase());
+        List<ModelDO> list = modelMapper.selectList(lqw);
+        return CopyUtils.copySetProperties(list, Model::new);
     }
 
     /**
@@ -352,6 +413,26 @@ public class ModelGatewayImpl implements ModelGateway {
         Map<String, Set<Field>> listMap = fields.stream().collect(Collectors.groupingBy(Field::getRelevanceId, Collectors.toSet()));
         return models.stream()
                 .peek(model -> model.setFields(listMap.get(model.getUuid()))).collect(Collectors.toSet());
+    }
+
+    /**
+     * 批量组装枚举模型列表
+     *
+     * @param models 模型列表
+     * @return 模型列表
+     */
+    private Set<Model> assembleEnumDetailsList(Set<Model> models) {
+        if (CollectionUtils.isEmpty(models)) {
+            return models;
+        }
+        Set<String> uuids = models.stream().map(Model::getUuid).collect(Collectors.toSet());
+        Map<String, Set<EnumValue>> enumValueListMap = enumValueGateway.getEnumValues(uuids);
+        //如果发布的都没有字段
+        if (enumValueListMap.isEmpty()) {
+            return models;
+        }
+        return models.stream()
+                .peek(model -> model.setEnumValues(enumValueListMap.get(model.getUuid()))).collect(Collectors.toSet());
     }
 
     /**

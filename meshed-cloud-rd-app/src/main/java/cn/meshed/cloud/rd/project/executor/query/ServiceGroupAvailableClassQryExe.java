@@ -37,7 +37,7 @@ public class ServiceGroupAvailableClassQryExe implements QueryExecute<ServiceAva
         AssertUtils.isTrue(serviceAvailableClassQry.getType() != null, "分组类型不能为空");
         //组装成类名
         String className = StrUtil.upperFirst(serviceAvailableClassQry.getKey())
-                + serviceAvailableClassQry.getType().getKey();
+                + serviceAvailableClassQry.getType().getExt();
 
         return ResultUtils.of(!serviceGroupGateway
                 .existGroupClassName(serviceAvailableClassQry.getProjectKey(), className), "分组标识已经存在", ShowType.SILENT);

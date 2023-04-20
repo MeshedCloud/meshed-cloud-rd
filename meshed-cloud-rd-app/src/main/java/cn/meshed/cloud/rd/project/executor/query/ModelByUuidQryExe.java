@@ -35,7 +35,7 @@ public class ModelByUuidQryExe implements QueryExecute<String, SingleResponse<Mo
         }
         ModelDetailDTO detailDTO = CopyUtils.copy(model, ModelDetailDTO.class);
         detailDTO.setDomain(model.getDomainKey());
-        detailDTO.setKey(model.getClassName().replace(model.getType().getKey(), ""));
+        detailDTO.setKey(model.getClassName().replace(model.getType().getExt(), ""));
         detailDTO.setFields(CopyUtils.copyListProperties(model.getFields(), RequestFieldDTO.class));
         return ResultUtils.of(detailDTO);
     }

@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.project.EnumValue;
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Model;
 import cn.meshed.cloud.rd.domain.project.Project;
@@ -8,7 +9,9 @@ import cn.meshed.cloud.rd.domain.project.gateway.DomainGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
 import cn.meshed.cloud.rd.project.command.ModelCmd;
+import cn.meshed.cloud.rd.project.data.EnumValueDTO;
 import cn.meshed.cloud.rd.project.data.RequestFieldDTO;
+import cn.meshed.cloud.rd.project.enums.ModelTypeEnum;
 import cn.meshed.cloud.rd.project.enums.OperateEnum;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.utils.AssertUtils;
@@ -19,10 +22,13 @@ import com.alibaba.cola.exception.SysException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <h1></h1>
@@ -90,12 +96,29 @@ public class ModelCmdExe implements CommandExecute<ModelCmd, Response> {
         } else {
             throw new SysException("不存在此操作:" + modelCmd.getOperate());
         }
-        List<RequestFieldDTO> fields = modelCmd.getFields();
-        if (CollectionUtils.isNotEmpty(fields)) {
-            model.setFields(CopyUtils.copySetProperties(fields, Field::new));
+        if (ModelTypeEnum.ENUM.equals(modelCmd.getType())) {
+            List<EnumValueDTO> enumValues = modelCmd.getEnumValues();
+            if (CollectionUtils.isNotEmpty(enumValues)) {
+                model.setEnumValues(getEnumValues(model, enumValues));
+            }
+        } else {
+            List<RequestFieldDTO> fields = modelCmd.getFields();
+            if (CollectionUtils.isNotEmpty(fields)) {
+                model.setFields(CopyUtils.copySetProperties(fields, Field::new));
+            }
         }
+
 
         String uuid = modelGateway.save(model);
         return ResultUtils.of(uuid);
+    }
+
+    @NotNull
+    private Set<EnumValue> getEnumValues(Model model, List<EnumValueDTO> enumValues) {
+        Set<EnumValue> values = CopyUtils.copySetProperties(enumValues, EnumValue::new);
+        AssertUtils.isTrue(values.size() == model.getEnumValues().size(), "枚举常量存在重复名称");
+        Set<Integer> valueSet = values.stream().map(EnumValue::getValue).collect(Collectors.toSet());
+        AssertUtils.isTrue(valueSet.size() == model.getEnumValues().size(), "枚举参数存在重复值");
+        return values;
     }
 }

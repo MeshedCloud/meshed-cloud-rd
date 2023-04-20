@@ -6,14 +6,13 @@ import cn.meshed.cloud.rd.deployment.data.WarehouseDTO;
 import cn.meshed.cloud.rd.deployment.data.WarehouseSelectDTO;
 import cn.meshed.cloud.rd.deployment.query.WarehousePageQry;
 import cn.meshed.cloud.rd.domain.deployment.ability.WarehouseAbility;
+import com.alibaba.cola.dto.MultiResponse;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.dto.Response;
-import com.alibaba.cola.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * <h1>仓库Web适配器</h1>
@@ -55,10 +54,10 @@ public class WarehouseWebAdapter implements WarehouseAdapter {
      * 逻辑仓库选项
      *
      * @param projectKey 项目唯一标识
-     * @return {@link SingleResponse<List<WarehouseSelectDTO>>}
+     * @return {@link MultiResponse<WarehouseSelectDTO>}
      */
     @Override
-    public SingleResponse<List<WarehouseSelectDTO>> select(@Valid String projectKey) {
+    public MultiResponse<WarehouseSelectDTO> select(@Valid String projectKey) {
         return warehouseAbility.select(projectKey);
     }
 

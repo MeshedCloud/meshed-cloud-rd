@@ -1,0 +1,6 @@
+spring:
+  cloud:
+    nacos:
+      #服务发现
+      discovery:
+        ip: ${DUBBO_IP_TO_REGISTRY:}

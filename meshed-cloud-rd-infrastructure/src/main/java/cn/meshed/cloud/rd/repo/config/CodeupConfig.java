@@ -1,4 +1,4 @@
-package cn.meshed.cloud.rd.deployment.config;
+package cn.meshed.cloud.rd.repo.config;
 
 import com.aliyun.devops20210625.Client;
 import com.aliyun.teaopenapi.models.Config;
