@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
 import cn.meshed.cloud.rd.domain.repo.CreateRepositoryGroup;
@@ -48,6 +49,7 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
      * @param projectCmd
      * @return
      */
+    @Trend(key = "#{projectCmd.key}", content = "项目立项")
     @Override
     public Response execute(ProjectCmd projectCmd) {
         //构建项目信息

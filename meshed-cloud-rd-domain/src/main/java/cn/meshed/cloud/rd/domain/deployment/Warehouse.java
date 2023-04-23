@@ -9,7 +9,9 @@ import cn.meshed.cloud.rd.deployment.enums.WarehouseStatusEnum;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.project.enums.ProjectAccessModeEnum;
 import cn.meshed.cloud.utils.AssertUtils;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -45,6 +47,7 @@ public class Warehouse implements Serializable {
     /**
      * 仓库名称
      */
+    @Setter(AccessLevel.NONE)
     private String repoName;
 
     /**
@@ -116,6 +119,11 @@ public class Warehouse implements Serializable {
         warehouse.setStatus(WarehouseStatusEnum.NORMAL);
 
         return warehouse;
+    }
+
+    public void setRepoName(String repoName) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repoName), "仓库名称不能为空");
+        this.repoName = repoName.toLowerCase();
     }
 
     /**

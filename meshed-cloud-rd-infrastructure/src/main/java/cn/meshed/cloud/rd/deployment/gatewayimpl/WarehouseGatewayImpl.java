@@ -92,7 +92,7 @@ public class WarehouseGatewayImpl implements WarehouseGateway {
     @Override
     public List<Warehouse> select(WarehouseSelectParam param) {
         LambdaQueryWrapper<WarehouseDO> lqw = new LambdaQueryWrapper<>();
-        lqw.select(WarehouseDO::getUuid, WarehouseDO::getName, WarehouseDO::getPurposeType)
+        lqw.select(WarehouseDO::getUuid, WarehouseDO::getName, WarehouseDO::getPurposeType, WarehouseDO::getRepoName)
                 .eq(StringUtils.isNotBlank(param.getProjectKey()), WarehouseDO::getProjectKey, param.getProjectKey())
                 .eq(param.getRepoType() != null, WarehouseDO::getRepoType, param.getRepoType())
                 .in(CollectionUtils.isNotEmpty(param.getPurposeTypes()), WarehouseDO::getPurposeType, param.getPurposeTypes());

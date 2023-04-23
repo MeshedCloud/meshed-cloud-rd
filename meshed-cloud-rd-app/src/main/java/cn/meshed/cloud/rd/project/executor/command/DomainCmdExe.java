@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.Domain;
 import cn.meshed.cloud.rd.domain.project.gateway.DomainGateway;
 import cn.meshed.cloud.rd.project.command.DomainCmd;
@@ -27,6 +28,7 @@ public class DomainCmdExe implements CommandExecute<DomainCmd, Response> {
      * @param domainCmd
      * @return
      */
+    @Trend(key = "#{domainCmd.projectKey}", content = "新增领域:+#{domainCmd.key}")
     @Override
     public Response execute(DomainCmd domainCmd) {
         if (domainCmd == null || StringUtils.isEmpty(domainCmd.getKey())) {

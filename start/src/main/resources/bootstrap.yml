@@ -60,18 +60,6 @@ spring:
   #          refresh: true            # 是否动态刷新，默认为false
 
 dubbo:
-  protocol:
-    name: dubbo
-    port: -1
-    check: false
-  registry:
-    address: nacos://${spring.cloud.nacos.config.server-addr}
   application:
     name: rd-dubbo
-    register-consumer: true
-  consumer:
-    check: false
-    timeout: 5000
-    retries: 2
-  reference:
-    check: false
+

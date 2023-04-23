@@ -7,6 +7,7 @@ import cn.meshed.cloud.rd.deployment.event.VersionPublishEvent;
 import cn.meshed.cloud.rd.domain.deployment.strategy.AsyncPublishStrategy;
 import cn.meshed.cloud.rd.domain.deployment.strategy.Publish;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishType;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <h1></h1>
@@ -35,6 +37,8 @@ public class VersionPublishEventExe implements EventExecute<VersionPublishEvent,
      * @param versionPublishEvent 执行器 {@link VersionPublishEvent}
      * @return {@link Response}
      */
+    @Trend(key = "#{versionPublishEvent.projectKey}", content = "#{versionPublishEvent.message}发布")
+    @Transactional
     @Override
     public Response execute(VersionPublishEvent versionPublishEvent) {
         Publish publish = CopyUtils.copy(versionPublishEvent, Publish.class);

@@ -2,7 +2,6 @@ package cn.meshed.cloud.rd.domain.cli;
 
 import cn.meshed.cloud.utils.AssertUtils;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * <h1>脚手架信息</h1>
@@ -16,7 +15,7 @@ public class Skeleton {
     /**
      * 引擎模板 具体的模板
      */
-    private String engineTemplate;
+    private EngineTemplate engineTemplate;
     /**
      * 基本包名
      */
@@ -38,6 +37,6 @@ public class Skeleton {
      * 校验
      */
     public void verification() {
-        AssertUtils.isTrue(StringUtils.isNotBlank(this.engineTemplate), "引擎模板不能为空");
+        AssertUtils.isTrue(this.engineTemplate != null, "引擎模板不存在");
     }
 }

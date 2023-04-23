@@ -26,4 +26,12 @@ public interface MemberGateway extends IPageList<MemberPageQry, PageResponse<Mem
      * @return 存在账号ID
      */
     Set<Long> filterPresentByUserId(Set<Long> ids);
+
+    /**
+     * 通过用户ID查询成员ID
+     *
+     * @param uid 用户ID
+     * @return
+     */
+    Integer queryIdByUid(Long uid);
 }

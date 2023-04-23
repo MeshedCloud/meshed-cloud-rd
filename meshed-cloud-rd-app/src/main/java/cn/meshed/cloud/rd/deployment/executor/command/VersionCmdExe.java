@@ -2,6 +2,7 @@ package cn.meshed.cloud.rd.deployment.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
 import cn.meshed.cloud.rd.deployment.command.VersionCmd;
+import cn.meshed.cloud.rd.deployment.enums.EnvironmentEnum;
 import cn.meshed.cloud.rd.deployment.enums.PublishTypeEnum;
 import cn.meshed.cloud.rd.deployment.enums.VersionStatusEnum;
 import cn.meshed.cloud.rd.deployment.enums.VersionTypeEnum;
@@ -11,6 +12,9 @@ import cn.meshed.cloud.rd.domain.deployment.Version;
 import cn.meshed.cloud.rd.domain.deployment.Warehouse;
 import cn.meshed.cloud.rd.domain.deployment.gateway.VersionGateway;
 import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
+import cn.meshed.cloud.rd.domain.deployment.strategy.AsyncPublishStrategy;
+import cn.meshed.cloud.rd.domain.deployment.strategy.PublishType;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.stream.StreamBridgeSender;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.ResultUtils;
@@ -21,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static cn.meshed.cloud.rd.domain.deployment.constant.MqConstant.VERSION_PUBLISH;
 
@@ -36,6 +41,7 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
 
     private final VersionGateway versionGateway;
     private final WarehouseGateway warehouseGateway;
+    private final AsyncPublishStrategy asyncPublishStrategy;
     private final StreamBridgeSender streamBridgeSender;
 
     @Value("${workflow.approve.enable:false}")
@@ -47,6 +53,8 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
      * @param versionCmd 执行器 {@link VersionCmd}
      * @return {@link Response}
      */
+    @Trend(key = "#{versionCmd.projectKey}", content = "#{versionCmd.commitMessage}: 提交发布")
+    @Transactional
     @Override
     public Response execute(VersionCmd versionCmd) {
         Version version = null;
@@ -64,13 +72,13 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
             versionGateway.change(version);
         }
         VersionPublishEvent event = getVersionPublishEvent(versionCmd, version);
-        //如果审批流程启用发起审批，又审批进行触达构建
-        if (approveEnable) {
-            initiateApproval(event);
-        } else {
-            //如果审批流程未启用直接发送构建事件
-            streamBridgeSender.send(VERSION_PUBLISH, event);
-        }
+        /**
+         * 1.代码推送
+         * 2.发起审批
+         * 3.审批结束产生版本完成事件
+         */
+        streamBridgeSender.send(VERSION_PUBLISH, event);
+        //todo 发起审批，和代码推送同步
         return ResultUtils.ok();
     }
 
@@ -113,5 +121,13 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
             return PublishTypeEnum.CLIENT;
         }
         throw new SysException("其他未实现");
+    }
+
+    @NotNull
+    private PublishType getPublishType(PublishTypeEnum publishType, EnvironmentEnum environment) {
+        if (publishType == PublishTypeEnum.CLIENT && environment == EnvironmentEnum.SNAPSHOT) {
+            return PublishType.CLIENT;
+        }
+        throw new SysException("其他发布暂未实现");
     }
 }

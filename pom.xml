@@ -30,6 +30,7 @@
         <meshed.dubbo.version>1.0.0-SNAPSHOT</meshed.dubbo.version>
         <meshed.context.version>1.0.0-SNAPSHOT</meshed.context.version>
         <meshde.cloud.stream.version>1.0.0-SNAPSHOT</meshde.cloud.stream.version>
+        <meshde.cloud.aop.version>1.0.0-SNAPSHOT</meshde.cloud.aop.version>
         <meshde.cloud.rd.codegen.version>1.0.0-SNAPSHOT</meshde.cloud.rd.codegen.version>
     </properties>
 
@@ -124,6 +125,11 @@
                 <groupId>cn.meshed.cloud</groupId>
                 <artifactId>meshed-cloud-stream-starter</artifactId>
                 <version>${meshde.cloud.stream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.meshed.cloud</groupId>
+                <artifactId>meshed-cloud-aop-starter</artifactId>
+                <version>${meshde.cloud.aop.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.meshed.cloud.rd</groupId>

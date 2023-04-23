@@ -1,8 +1,11 @@
 package cn.meshed.cloud.rd.deployment.gateway;
 
-import cn.meshed.cloud.context.SecurityContext;
 import cn.meshed.cloud.rd.ProviderApplication;
+import cn.meshed.cloud.rd.deployment.command.WarehouseAddCmd;
+import cn.meshed.cloud.rd.deployment.enums.WarehousePurposeTypeEnum;
 import cn.meshed.cloud.rd.deployment.executor.command.WarehouseAddCmdExe;
+import cn.meshed.cloud.rd.domain.deployment.Warehouse;
+import com.alibaba.cola.dto.SingleResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +27,13 @@ public class WarehouseAddCmdExeTest {
 
     @Test
     public void execute() {
-        System.out.println(SecurityContext.getOperatorUserId());
-//        WarehouseAddCmd warehouseAddCmd = new WarehouseAddCmd();
-//        warehouseAddCmd.setProjectKey("PROPERTY");
-//        warehouseAddCmd.setRepoName("meshed-cloud-property");
-//        warehouseAddCmd.setDescription("xxxxx");
-//        warehouseAddCmd.setPurposeType(WarehousePurposeTypeEnum.SERVICE);
-//        warehouseAddCmd.setName("xxx");
-//        SingleResponse<Warehouse> execute = warehouseAddCmdExe.execute(warehouseAddCmd);
-//        System.out.println(execute);
+        WarehouseAddCmd warehouseAddCmd = new WarehouseAddCmd();
+        warehouseAddCmd.setProjectKey("PROPERTY");
+        warehouseAddCmd.setRepoName("meshed-cloud-property");
+        warehouseAddCmd.setDescription("xxxxx");
+        warehouseAddCmd.setPurposeType(WarehousePurposeTypeEnum.SERVICE);
+        warehouseAddCmd.setName("xxx");
+        SingleResponse<Warehouse> execute = warehouseAddCmdExe.execute(warehouseAddCmd);
+        System.out.println(execute);
     }
 }

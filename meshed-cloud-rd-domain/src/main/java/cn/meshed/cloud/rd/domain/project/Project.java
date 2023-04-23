@@ -100,7 +100,7 @@ public class Project implements Serializable {
         this.key = this.key.toUpperCase();
         this.version = INIT_VERSION;
         this.ownerId = SecurityContext.getUserId();
-        this.status = ProjectStatusEnum.RD;
+        this.status = ProjectStatusEnum.APPLY;
     }
 
     /**

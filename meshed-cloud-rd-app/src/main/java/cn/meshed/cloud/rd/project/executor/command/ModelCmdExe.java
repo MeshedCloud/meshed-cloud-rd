@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.EnumValue;
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Model;
@@ -49,6 +50,7 @@ public class ModelCmdExe implements CommandExecute<ModelCmd, Response> {
      * @return
      */
     @Transactional
+    @Trend(key = "#{modelCmd.projectKey}", content = "新增模型:+#{modelCmd.name}")
     @Override
     public Response execute(ModelCmd modelCmd) {
 

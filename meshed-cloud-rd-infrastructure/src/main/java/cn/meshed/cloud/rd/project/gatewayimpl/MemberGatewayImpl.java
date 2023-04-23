@@ -97,4 +97,22 @@ public class MemberGatewayImpl implements MemberGateway {
         }
         return list.stream().map(MemberDO::getUid).collect(Collectors.toSet());
     }
+
+    /**
+     * 通过用户ID查询成员ID
+     *
+     * @param uid 用户ID
+     * @return
+     */
+    @Override
+    public Integer queryIdByUid(Long uid) {
+        AssertUtils.isTrue(uid != null, "id不能为空");
+        LambdaQueryWrapper<MemberDO> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(MemberDO::getUid, uid);
+        MemberDO memberDO = memberMapper.selectOne(lqw);
+        if (memberDO == null) {
+            return null;
+        }
+        return memberDO.getId();
+    }
 }

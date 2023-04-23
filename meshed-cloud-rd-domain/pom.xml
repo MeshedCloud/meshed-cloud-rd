@@ -48,5 +48,9 @@
             <groupId>cn.meshed.cloud.rd</groupId>
             <artifactId>meshed-cloud-rd-codegen</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.meshed.cloud</groupId>
+            <artifactId>meshed-cloud-aop-starter</artifactId>
+        </dependency>
     </dependencies>
 </project>

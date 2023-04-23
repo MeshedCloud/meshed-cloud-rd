@@ -1,12 +1,8 @@
 package cn.meshed.cloud.rd.cli.gateway;
 
-import cn.hutool.core.io.FileUtil;
-import cn.meshed.cloud.rd.domain.repo.RepositoryFile;
+import cn.meshed.cloud.exception.security.AuthenticationException;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * <h1></h1>
@@ -17,13 +13,15 @@ import java.util.List;
 public class FileTest {
 
     public static void main(String[] args) {
-        String projectPath = "D:\\Temp\\meshed-cloud-test";
-        List<File> list = FileUtil.loopFiles(projectPath);
-        List<RepositoryFile> repositoryFiles = new ArrayList<>();
-        for (File file : list) {
-            String content = FileUtil.readString(file, StandardCharsets.UTF_8);
-            String path = file.getPath().substring(projectPath.length() + 1).replaceAll("\\\\", "/");
-            repositoryFiles.add(new RepositoryFile(path, content));
-        }
+//        String projectPath = "D:\\Temp\\meshed-cloud-test";
+//        List<File> list = FileUtil.loopFiles(projectPath);
+//        List<RepositoryFile> repositoryFiles = new ArrayList<>();
+//        for (File file : list) {
+//            String content = FileUtil.readString(file, StandardCharsets.UTF_8);
+//            String path = file.getPath().substring(projectPath.length() + 1).replaceAll("\\\\", "/");
+//            repositoryFiles.add(new RepositoryFile(path, content));
+//        }
+        Optional.ofNullable(null)
+                .orElseThrow(() -> new AuthenticationException("未登入,无用户信息"));
     }
 }

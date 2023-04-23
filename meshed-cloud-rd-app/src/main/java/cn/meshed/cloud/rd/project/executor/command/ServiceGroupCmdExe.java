@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.domain.project.ServiceGroup;
 import cn.meshed.cloud.rd.domain.project.gateway.DomainGateway;
@@ -35,6 +36,7 @@ public class ServiceGroupCmdExe implements CommandExecute<ServiceGroupCmd, Singl
      * @param serviceGroupCmd 执行器 {@link ServiceGroupCmd}
      * @return {@link SingleResponse<ServiceGroup>}
      */
+    @Trend(key = "#{serviceGroupCmd.projectKey}", content = "新增服务分组:+#{serviceGroupCmd.name}")
     @Transactional
     @Override
     public SingleResponse<ServiceGroup> execute(ServiceGroupCmd serviceGroupCmd) {

@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.deployment.executor.command;
 
 import cn.meshed.cloud.cqrs.EventExecute;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.project.event.ProjectInitializeEvent;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
@@ -26,6 +27,7 @@ public class SystemConfigByProjectEventExe implements EventExecute<ProjectInitia
      * @param projectInitializeEvent 执行器 {@link ProjectInitializeEvent}
      * @return {@link Consumer <ProjectInitializeEvent>}
      */
+    @Trend(key = "#{projectInitializeEvent.key}", content = "#{projectInitializeEvent.name}+配置项目")
     @Override
     public Response execute(ProjectInitializeEvent projectInitializeEvent) {
 

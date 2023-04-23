@@ -1,6 +1,7 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.Member;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.domain.project.ProjectMember;
@@ -42,6 +43,7 @@ public class ProjectMemberCmdExe implements CommandExecute<ProjectMemberCmd, Res
      * @return {@link Response}
      */
     @Override
+    @Trend(key = "#{projectMemberCmd.projectKey}", content = "添加项目成员:+#{projectMemberCmd.memberIds} 角色: +#{projectMemberCmd.projectRole}")
     @Transactional
     public Response execute(ProjectMemberCmd projectMemberCmd) {
         AssertUtils.isTrue(StringUtils.isNotBlank(projectMemberCmd.getProjectKey()), "项目标识不能为空");
@@ -58,7 +60,7 @@ public class ProjectMemberCmdExe implements CommandExecute<ProjectMemberCmd, Res
     private void newProjectMember(Integer mid, ProjectMemberCmd projectMemberCmd, Project project) {
         Member member = memberGateway.query(mid);
         AddRepositoryMember addRepositoryMember = new AddRepositoryMember();
-        addRepositoryMember.setRepoUid(addRepositoryMember.getRepoUid());
+        addRepositoryMember.setRepoUid(member.getThirdUid());
         addRepositoryMember.setAccessLevel(projectMemberCmd.getProjectRole().getValue());
         assert project != null;
         repositoryGateway.addGroupMember(String.valueOf(project.getThirdId()), addRepositoryMember);

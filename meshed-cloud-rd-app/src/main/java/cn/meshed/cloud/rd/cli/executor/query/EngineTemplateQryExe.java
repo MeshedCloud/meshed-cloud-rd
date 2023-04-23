@@ -3,6 +3,7 @@ package cn.meshed.cloud.rd.cli.executor.query;
 import cn.meshed.cloud.cqrs.QueryExecute;
 import cn.meshed.cloud.rd.cli.config.EngineTemplateProperties;
 import cn.meshed.cloud.rd.domain.cli.Archetype;
+import cn.meshed.cloud.rd.domain.cli.EngineTemplate;
 import cn.meshed.cloud.utils.AssertUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,7 +21,7 @@ import java.util.Objects;
  */
 @RequiredArgsConstructor
 @Component
-public class ArchetypeTemplateQry implements QueryExecute<String, Archetype> {
+public class EngineTemplateQryExe implements QueryExecute<String, EngineTemplate> {
 
     private final EngineTemplateProperties engineTemplateProperties;
 
@@ -31,12 +32,12 @@ public class ArchetypeTemplateQry implements QueryExecute<String, Archetype> {
      * @return {@link Archetype}
      */
     @Override
-    public Archetype execute(String engineTemplate) {
+    public EngineTemplate execute(String engineTemplate) {
         AssertUtils.isTrue(StringUtils.isNotBlank(engineTemplate), "模板引擎名称不能为空");
-        List<Archetype> engineTemplates = engineTemplateProperties.getEngineTemplates();
+        List<EngineTemplate> engineTemplates = engineTemplateProperties.getEngineTemplates();
         if (CollectionUtils.isNotEmpty(engineTemplates)) {
             return engineTemplates.stream().filter(Objects::nonNull)
-                    .filter(archetype -> engineTemplate.equalsIgnoreCase(archetype.getArchetypeArtifactId()))
+                    .filter(template -> engineTemplate.equalsIgnoreCase(template.getId()))
                     .findFirst().orElse(null);
         }
         return null;

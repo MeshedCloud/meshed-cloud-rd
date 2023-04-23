@@ -28,7 +28,7 @@ public class SkeletonCmdExeTest {
         skeleton.setRepositoryName("meshed-cloud-property-client");
         skeleton.setBasePackage("cn.meshed.cloud.property");
         skeleton.setProjectKey("PROPERTY");
-        skeleton.setEngineTemplate("meshed-cloud-client-archetype");
+//        skeleton.setEngineTemplate("meshed-cloud-client-archetype");
         skeleton.setRepositoryId("3243305");
         skeletonCmdExe.execute(skeleton);
     }

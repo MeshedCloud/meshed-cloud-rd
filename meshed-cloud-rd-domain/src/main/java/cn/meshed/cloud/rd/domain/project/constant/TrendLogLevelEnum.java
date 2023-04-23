@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * <h1>字段关联类型</h1>
- * 模型/参数/body/响应/方法参数/方法返回
+ * <h1>动态日志等级</h1>
  *
  * @author Vincent Vic
  * @version 1.0
@@ -15,20 +14,24 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @ToString
-public enum RelevanceTypeEnum {
+public enum TrendLogLevelEnum {
 
     /**
-     * 模型
+     * 信息
      */
-    MODEL(1, "model"),
+    INFO(1, "INFO"),
     /**
-     * 请求
+     * 错误
      */
-    REQUEST(2, "request"),
+    ERROR(2, "ERROR"),
     /**
-     * 响应
+     * 警告
      */
-    RESPONSE(3, "response"),
+    WARN(3, "WARN"),
+    /**
+     * 异常
+     */
+    EXCEPTION(3, "EXCEPTION"),
     ;
 
     @EnumValue

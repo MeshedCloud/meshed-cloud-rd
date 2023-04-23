@@ -1,13 +1,16 @@
 package cn.meshed.cloud.rd.deployment.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.cli.executor.query.EngineTemplateQryExe;
 import cn.meshed.cloud.rd.deployment.command.WarehouseAddCmd;
 import cn.meshed.cloud.rd.deployment.enums.WarehouseOperateEnum;
 import cn.meshed.cloud.rd.deployment.enums.WarehouseRelationEnum;
 import cn.meshed.cloud.rd.deployment.enums.WarehouseRepoTypeEnum;
 import cn.meshed.cloud.rd.deployment.event.WarehouseInitializeEvent;
+import cn.meshed.cloud.rd.domain.cli.EngineTemplate;
 import cn.meshed.cloud.rd.domain.deployment.Warehouse;
 import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
+import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
 import cn.meshed.cloud.rd.domain.repo.Branch;
@@ -19,7 +22,6 @@ import cn.meshed.cloud.rd.domain.repo.gateway.RepositoryGateway;
 import cn.meshed.cloud.rd.project.enums.ProjectAccessModeEnum;
 import cn.meshed.cloud.stream.StreamBridgeSender;
 import cn.meshed.cloud.utils.AssertUtils;
-import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
@@ -51,6 +53,7 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
     private final WarehouseGateway warehouseGateway;
     private final RepositoryGateway repositoryGateway;
     private final ProjectGateway projectGateway;
+    private final EngineTemplateQryExe engineTemplateQryExe;
     private final StreamBridgeSender streamBridgeSender;
 
     /**
@@ -59,6 +62,7 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
      * @param warehouseAddCmd 执行器 {@link WarehouseAddCmd}
      * @return {@link Response}
      */
+    @Trend(key = "#{warehouseAddCmd.projectKey}", content = "创建仓库:+#{warehouseAddCmd.name}")
     @Override
     public SingleResponse<Warehouse> execute(WarehouseAddCmd warehouseAddCmd) {
         try {
@@ -69,6 +73,15 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
 
             //创建逻辑仓库
             Warehouse warehouse = warehouseGateway.save(buildWarehouse(warehouseAddCmd, project, repository));
+
+
+            //新建需要直接初始化
+            if (warehouseAddCmd.getOperate() == WarehouseOperateEnum.NEW) {
+                //非导入需要初始化
+                initRepo(repository.getRepositoryId());
+            }
+            //初始化分支
+            initBranch(repository.getRepositoryId());
             //新建需要直接初始化
             if (warehouseAddCmd.getOperate() == WarehouseOperateEnum.NEW) {
                 //判断是否根据模板创建
@@ -77,8 +90,7 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
                     publishBuild(warehouseAddCmd.getEngineTemplate(), warehouse, repository, project);
                 }
             }
-            //后续处理导入的分支业务
-            initBranch(repository.getRepositoryId());
+
             //返回仓库信息
             return ResultUtils.of(warehouse);
         } catch (SysException sysException) {
@@ -87,22 +99,17 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
     }
 
     private void initBranch(String repositoryId) {
-        //master 需要占位文件
-        if (initRepo(repositoryId) != 1) {
-            log.error("init master fail");
-            return;
-        }
         repositoryGateway.createBranch(repositoryId, new Branch(RELEASE, MASTER));
         repositoryGateway.createBranch(repositoryId, new Branch(DEVELOP, MASTER));
     }
 
-    private Integer initRepo(String repositoryId) {
+    private void initRepo(String repositoryId) {
         CommitRepositoryFile commitRepositoryFile = new CommitRepositoryFile();
         commitRepositoryFile.setRepositoryId(repositoryId);
         commitRepositoryFile.setCommitMessage("init");
         commitRepositoryFile.setBranchName(MASTER);
         commitRepositoryFile.setFiles(Collections.singletonList(new RepositoryFile("MeshedCloud.md", "# Meshed Cloud")));
-        return repositoryGateway.commitRepositoryFile(commitRepositoryFile);
+        repositoryGateway.commitRepositoryFile(commitRepositoryFile);
     }
 
     /**
@@ -144,6 +151,16 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
         warehouse.setRepoUrl(repository.getRepoUrl());
         warehouse.setName(warehouseAddCmd.getName());
         warehouse.setRepoId(repository.getRepositoryId());
+        if (StringUtils.isNotBlank(warehouseAddCmd.getEngineTemplate())) {
+            //适配git 模板构建
+            EngineTemplate engineTemplate = engineTemplateQryExe.execute(warehouseAddCmd.getEngineTemplate());
+            //模板引擎存在，且是GIT模板
+            if (engineTemplate != null && engineTemplate.getType() == EngineTemplate.EngineTemplateType.GIT_TEMPLATE) {
+                warehouseAddCmd.setOperate(WarehouseOperateEnum.IMPORT);
+                warehouseAddCmd.setRepoUrl(engineTemplate.getOrigin() + engineTemplate.getId());
+            }
+        }
+
         if (warehouseAddCmd.getOperate() == WarehouseOperateEnum.IMPORT) {
             for (WarehouseRepoTypeEnum warehouseRepoType : WarehouseRepoTypeEnum.values()) {
                 if (warehouseAddCmd.getRepoUrl().contains(warehouseRepoType.getExt())) {
@@ -166,7 +183,7 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
     private Repository getRepositoryWithBuild(WarehouseAddCmd warehouseAddCmd, Project project) {
         Repository repository = repositoryGateway.getRepository(
                 project.getIdentity() + "/" + warehouseAddCmd.getRepoName());
-        AssertUtils.isTrue(repository == null, "仓库已经存在");
+        AssertUtils.isTrue(repository == null, warehouseAddCmd.getRepoName() + "仓库已经存在");
         CreateRepository createRepository = new CreateRepository();
         //核心在仓库层面为私有
         createRepository.setVisible(project.getAccessMode() == ProjectAccessModeEnum.CORE);
@@ -179,20 +196,6 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
     }
 
     /**
-     * 构建逻辑仓库对象
-     *
-     * @param warehouseAddCmd 逻辑仓库新增对象
-     * @param project         项目
-     * @return 返回逻辑仓库模型
-     */
-    @NotNull
-    private Warehouse buildWarehouse(WarehouseAddCmd warehouseAddCmd, Project project) {
-        Warehouse warehouse = CopyUtils.copy(warehouseAddCmd, Warehouse.class);
-        warehouse.initNewWarehouse(project.getAccessMode());
-        return warehouse;
-    }
-
-    /**
      * 校验仓库信息
      *
      * @param warehouseAddCmd
@@ -201,7 +204,7 @@ public class WarehouseAddCmdExe implements CommandExecute<WarehouseAddCmd, Singl
         String projectKey = warehouseAddCmd.getProjectKey();
         Project project = projectGateway.queryByKey(projectKey);
         AssertUtils.isTrue(project != null, "归属项目并不存在");
-        AssertUtils.isTrue(!warehouseGateway.existWarehouseName(warehouseAddCmd.getRepoName()), "仓库已经存在");
+        AssertUtils.isTrue(!warehouseGateway.existWarehouseName(warehouseAddCmd.getRepoName()), warehouseAddCmd.getRepoName() + "仓库已经存在");
         return project;
     }
 }
