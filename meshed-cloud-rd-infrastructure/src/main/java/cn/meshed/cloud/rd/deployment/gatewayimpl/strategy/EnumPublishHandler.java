@@ -4,6 +4,7 @@ import cn.meshed.cloud.rd.codegen.ObjectEnum;
 import cn.meshed.cloud.rd.codegen.ObjectEnumValue;
 import cn.meshed.cloud.rd.domain.cli.GenerateEnum;
 import cn.meshed.cloud.rd.domain.cli.gateway.CliGateway;
+import cn.meshed.cloud.rd.domain.common.VersionFormat;
 import cn.meshed.cloud.rd.domain.deployment.strategy.AbstractServicePublish;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishHandler;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishType;
@@ -107,7 +108,7 @@ public class EnumPublishHandler extends AbstractServicePublish implements Publis
         objectEnum.setClassName(model.getClassName());
         objectEnum.setSuperClass(model.getSuperClass());
         objectEnum.setExplain(model.getName());
-        objectEnum.setVersion(model.getVersion().toString());
+        objectEnum.setVersion(VersionFormat.version(model.getVersion()));
 
         if (CollectionUtils.isNotEmpty(model.getFields())) {
             //枚举数据转换

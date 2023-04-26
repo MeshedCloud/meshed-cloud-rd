@@ -1,11 +1,14 @@
 package cn.meshed.cloud.rd.deployment.gatewayimpl.strategy;
 
+import cn.meshed.cloud.rd.domain.deployment.VersionOccupyGateway;
 import cn.meshed.cloud.rd.domain.deployment.strategy.AsyncPublishStrategy;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishHandler;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishType;
 import cn.meshed.cloud.rd.domain.deployment.strategy.dto.ServicePublish;
+import cn.meshed.cloud.rd.domain.project.Service;
 import cn.meshed.cloud.rd.domain.project.ServiceGroup;
 import cn.meshed.cloud.rd.domain.project.gateway.ServiceGroupGateway;
+import cn.meshed.cloud.rd.project.enums.ServiceModelTypeEnum;
 import cn.meshed.cloud.rd.project.enums.ServiceTypeEnum;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.CopyUtils;
@@ -32,6 +35,7 @@ public class ServicePublishHandler implements PublishHandler<ServicePublish> {
 
     private final ServiceGroupGateway serviceGroupGateway;
     private final AsyncPublishStrategy asyncPublishStrategy;
+    private final VersionOccupyGateway versionOccupyGateway;
 
     /**
      * 注册类型
@@ -56,6 +60,11 @@ public class ServicePublishHandler implements PublishHandler<ServicePublish> {
         if (CollectionUtils.isEmpty(serviceGroups)) {
             return;
         }
+        //记录占用
+        Set<String> serviceUuids = serviceGroups.stream()
+                .flatMap(serviceGroup -> serviceGroup.getServices().stream())
+                .map(Service::getUuid).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
+        versionOccupyGateway.saveBatch(servicePublish.getVersionId(), ServiceModelTypeEnum.SERVICE, serviceUuids);
         //服务分类适配器和rpc等
         Map<ServiceTypeEnum, Set<ServiceGroup>> serviceTypeMap = serviceGroups.stream()
                 .collect(Collectors.groupingBy(ServiceGroup::getType, Collectors.toSet()));

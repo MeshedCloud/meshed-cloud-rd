@@ -9,4 +9,5 @@ package cn.meshed.cloud.rd.domain.project.constant;
 public interface MqConstant {
 
     String PROJECT_INITIALIZE = "projectInitialization";
+    String APPROVE_PROJECT = "approveProject";
 }

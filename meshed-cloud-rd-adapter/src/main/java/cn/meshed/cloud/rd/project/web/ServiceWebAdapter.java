@@ -85,4 +85,48 @@ public class ServiceWebAdapter implements ServiceAdapter {
         return serviceAbility.availableMethodName(serviceAvailableMethodQry);
     }
 
+    /**
+     * 完成服务
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response complete(String uuid) {
+        return serviceAbility.complete(uuid);
+    }
+
+    /**
+     * 撤销完成
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response revoke(String uuid) {
+        return serviceAbility.revoke(uuid);
+    }
+
+    /**
+     * 废弃
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response discard(String uuid) {
+        return serviceAbility.discard(uuid);
+    }
+
+    /**
+     * 删除（仅支持编辑中的服务）
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response delete(String uuid) {
+        return serviceAbility.delete(uuid);
+    }
+
 }

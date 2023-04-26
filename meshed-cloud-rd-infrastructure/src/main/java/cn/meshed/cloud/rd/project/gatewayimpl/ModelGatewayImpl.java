@@ -7,10 +7,12 @@ import cn.meshed.cloud.rd.domain.project.constant.RelevanceTypeEnum;
 import cn.meshed.cloud.rd.domain.project.gateway.EnumValueGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.FieldGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
+import cn.meshed.cloud.rd.project.config.ObjectBasicTypeProperties;
 import cn.meshed.cloud.rd.project.convertor.ModelConvertor;
 import cn.meshed.cloud.rd.project.enums.ModelAccessModeEnum;
 import cn.meshed.cloud.rd.project.enums.ModelTypeEnum;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
+import cn.meshed.cloud.rd.project.enums.ServiceModelStatusEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ModelDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ModelMapper;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
@@ -19,6 +21,7 @@ import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.PageUtils;
 import com.alibaba.cola.dto.PageResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,6 +54,7 @@ public class ModelGatewayImpl implements ModelGateway {
     private final ModelMapper modelMapper;
     private final FieldGateway fieldGateway;
     private final EnumValueGateway enumValueGateway;
+    private final ObjectBasicTypeProperties objectBasicTypeProperties;
 
 
     /**
@@ -199,6 +203,104 @@ public class ModelGatewayImpl implements ModelGateway {
         fieldGateway.saveBatch(RelevanceTypeEnum.MODEL, fields);
         return true;
     }
+
+    /**
+     * 更新状态
+     *
+     * @param uuid          编码
+     * @param status        状态
+     * @param releaseStatus 发行状态
+     * @return 成功与否
+     */
+    @Override
+    public boolean updateStatus(String uuid, ServiceModelStatusEnum status, ReleaseStatusEnum releaseStatus) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(uuid), "编码参数不能为空");
+        AssertUtils.isTrue(status != null || releaseStatus != null, "状态参数不能为空");
+        LambdaUpdateWrapper<ModelDO> luw = new LambdaUpdateWrapper<>();
+        luw.set(status != null, ModelDO::getStatus, status)
+                .set(releaseStatus != null, ModelDO::getReleaseStatus, releaseStatus)
+                .eq(ModelDO::getUuid, uuid);
+        return modelMapper.update(null, luw) > 0;
+    }
+
+    /**
+     * 批量更新状态
+     *
+     * @param uuids         编码列表
+     * @param status        状态
+     * @param releaseStatus 发行状态
+     * @return 成功与否
+     */
+    @Override
+    public boolean batchUpdateStatus(Set<String> uuids, ServiceModelStatusEnum status, ReleaseStatusEnum releaseStatus) {
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(uuids), "关系列表不能为空");
+        AssertUtils.isTrue(status != null || releaseStatus != null, "状态不能为空");
+        List<ModelDO> models = modelMapper.selectBatchIds(uuids);
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(models), "不存在模型");
+        List<ModelDO> list = models.stream().peek(modelDO -> {
+            if (status != null) {
+                modelDO.setStatus(status);
+            }
+            if (releaseStatus != null) {
+                modelDO.setReleaseStatus(releaseStatus);
+            }
+        }).collect(Collectors.toList());
+        return modelMapper.updateBatch(list) > 0;
+    }
+
+    /**
+     * 模型检查合法性
+     *
+     * @param uuid
+     * @return 合法性
+     */
+    @Override
+    public boolean checkLegal(String uuid) {
+        Set<Field> fields = fieldGateway.listByModel(uuid);
+        //没有字段视为合法
+        if (CollectionUtils.isEmpty(fields)) {
+            return true;
+        }
+        Set<String> classNames = fields.stream().map(Field::getFieldType).collect(Collectors.toSet());
+        //检查是否存在类名还在编辑状态或者删除
+        return checkLegalByClassNames(classNames);
+    }
+
+    /**
+     * 通过类名检查模型合法性
+     *
+     * @param classNames 类名列表
+     * @return 合法性
+     */
+    @Override
+    public boolean checkLegalByClassNames(Set<String> classNames) {
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(classNames), "类名列表为空");
+        //过滤掉基本类型
+        classNames = filterBasicType(classNames);
+        //全部是基本类型合法
+        if (CollectionUtils.isEmpty(classNames)) {
+            return true;
+        }
+        //查询类名的所有对象且对象不是编辑状态
+        LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
+        lqw.select(ModelDO::getClassName, ModelDO::getReleaseStatus)
+                .in(ModelDO::getClassName, classNames)
+                .ne(ModelDO::getReleaseStatus, ReleaseStatusEnum.EDIT);
+        List<ModelDO> list = modelMapper.selectList(lqw);
+        AssertUtils.isTrue(list.size() == classNames.size(), "模型可能存在丢失或还在编辑");
+        return true;
+    }
+
+    @NotNull
+    private Set<String> filterBasicType(Set<String> classNames) {
+        List<String> basicTypes = objectBasicTypeProperties.getTypes();
+        if (CollectionUtils.isEmpty(basicTypes)) {
+            return classNames;
+        }
+        classNames = classNames.stream().filter(className -> !basicTypes.contains(className)).collect(Collectors.toSet());
+        return classNames;
+    }
+
 
     /**
      * 设置关系id 返回字段列表
@@ -449,5 +551,16 @@ public class ModelGatewayImpl implements ModelGateway {
                 .eq(ModelDO::getProjectKey, projectKey);
         List<ModelDO> list = modelMapper.selectList(lqw);
         return list.stream().map(ModelDO::getClassName).collect(Collectors.toSet());
+    }
+
+    /**
+     * 删除
+     *
+     * @param uuid 编码
+     * @return
+     */
+    @Override
+    public Boolean delete(String uuid) {
+        return modelMapper.deleteById(uuid) > 0;
     }
 }

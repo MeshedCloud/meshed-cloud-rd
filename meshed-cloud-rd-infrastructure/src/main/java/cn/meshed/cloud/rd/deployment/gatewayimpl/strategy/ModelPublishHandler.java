@@ -4,6 +4,8 @@ import cn.meshed.cloud.rd.codegen.ObjectField;
 import cn.meshed.cloud.rd.codegen.ObjectModel;
 import cn.meshed.cloud.rd.domain.cli.GenerateModel;
 import cn.meshed.cloud.rd.domain.cli.gateway.CliGateway;
+import cn.meshed.cloud.rd.domain.common.VersionFormat;
+import cn.meshed.cloud.rd.domain.deployment.VersionOccupyGateway;
 import cn.meshed.cloud.rd.domain.deployment.strategy.AbstractServicePublish;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishHandler;
 import cn.meshed.cloud.rd.domain.deployment.strategy.PublishType;
@@ -11,6 +13,7 @@ import cn.meshed.cloud.rd.domain.deployment.strategy.dto.ModelPublish;
 import cn.meshed.cloud.rd.domain.project.Model;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
 import cn.meshed.cloud.rd.domain.repo.Branch;
+import cn.meshed.cloud.rd.project.enums.ServiceModelTypeEnum;
 import cn.meshed.cloud.utils.AssertUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +31,11 @@ import java.util.stream.Collectors;
 @Component
 public class ModelPublishHandler extends AbstractServicePublish implements PublishHandler<ModelPublish> {
 
+    private final VersionOccupyGateway versionOccupyGateway;
 
-    public ModelPublishHandler(ModelGateway modelGateway, CliGateway cliGateway) {
+    public ModelPublishHandler(ModelGateway modelGateway, CliGateway cliGateway, VersionOccupyGateway versionOccupyGateway) {
         super(modelGateway, cliGateway);
+        this.versionOccupyGateway = versionOccupyGateway;
     }
 
     /**
@@ -55,6 +60,8 @@ public class ModelPublishHandler extends AbstractServicePublish implements Publi
         Set<Model> models = getModelGateway().waitPublishModelListByProject(projectKey);
         if (CollectionUtils.isNotEmpty(models)) {
             publishModel(modelPublish, models);
+            Set<String> uuidSet = models.stream().map(Model::getUuid).collect(Collectors.toSet());
+            versionOccupyGateway.saveBatch(modelPublish.getVersionId(), ServiceModelTypeEnum.MODEL, uuidSet);
         }
     }
 
@@ -106,7 +113,7 @@ public class ModelPublishHandler extends AbstractServicePublish implements Publi
         objectModel.setClassName(model.getClassName());
         objectModel.setSuperClass(model.getSuperClass());
         objectModel.setExplain(model.getName());
-        objectModel.setVersion(model.getVersion().toString());
+        objectModel.setVersion(VersionFormat.version(model.getVersion()));
 
         if (CollectionUtils.isNotEmpty(model.getFields())) {
             //字段转换

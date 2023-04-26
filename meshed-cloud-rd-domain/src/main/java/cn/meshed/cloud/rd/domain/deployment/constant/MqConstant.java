@@ -10,4 +10,5 @@ public interface MqConstant {
 
     String WAREHOUSE_INITIALIZE = "warehouseInitialize";
     String VERSION_PUBLISH = "versionPublish";
+    String VERSION_PUBLISH_APPROVE = "versionPublishApprove";
 }

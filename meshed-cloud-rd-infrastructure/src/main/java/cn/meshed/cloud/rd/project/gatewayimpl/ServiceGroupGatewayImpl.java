@@ -135,9 +135,9 @@ public class ServiceGroupGatewayImpl implements ServiceGroupGateway {
         if (CollectionUtils.isEmpty(serviceGroups)) {
             return Collections.emptySet();
         }
-        Set<String> uuids = serviceGroups.stream().map(ServiceGroupDO::getUuid).collect(Collectors.toSet());
+        Set<String> groupIds = serviceGroups.stream().map(ServiceGroupDO::getUuid).collect(Collectors.toSet());
         //查询出所有的服务，并分类出各个分组的服务
-        Set<Service> services = serviceGateway.listByUuids(uuids);
+        Set<Service> services = serviceGateway.listByGroupIds(groupIds);
         Map<String, Set<Service>> serviceMap = services.stream()
                 .collect(Collectors.groupingBy(Service::getGroupId, Collectors.toSet()));
 

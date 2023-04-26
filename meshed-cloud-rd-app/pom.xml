@@ -45,6 +45,11 @@
             <artifactId>meshed-cloud-iam-client</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>cn.meshed.cloud.workflow</groupId>
+            <artifactId>meshed-cloud-workflow-client</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 </project>

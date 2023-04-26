@@ -2,10 +2,14 @@ package cn.meshed.cloud.rd.project.executor;
 
 import cn.meshed.cloud.rd.domain.project.ability.ServiceAbility;
 import cn.meshed.cloud.rd.project.command.ServiceCmd;
+import cn.meshed.cloud.rd.project.command.ServiceStatusCmd;
 import cn.meshed.cloud.rd.project.data.ServiceDTO;
 import cn.meshed.cloud.rd.project.data.ServiceDetailDTO;
 import cn.meshed.cloud.rd.project.data.ServiceReleaseCountDTO;
+import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.executor.command.ServiceCmdExe;
+import cn.meshed.cloud.rd.project.executor.command.ServiceDelExe;
+import cn.meshed.cloud.rd.project.executor.command.ServiceStatusCmdExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceAvailableMethodQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceByUuidQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServicePageQryExe;
@@ -31,6 +35,8 @@ public class ServiceAbilityImpl implements ServiceAbility {
     private final ServicePageQryExe servicePageQryExe;
     private final ServiceByUuidQryExe serviceByUuidQryExe;
     private final ServiceCmdExe serviceCmdExe;
+    private final ServiceDelExe serviceDelExe;
+    private final ServiceStatusCmdExe serviceStatusCmdExe;
     private final ServiceReleaseCountQryExe serviceReleaseCountQryExe;
     private final ServiceAvailableMethodQryExe serviceAvailableMethodQryExe;
 
@@ -87,5 +93,58 @@ public class ServiceAbilityImpl implements ServiceAbility {
     @Override
     public Response availableMethodName(ServiceAvailableMethodQry serviceAvailableMethodQry) {
         return serviceAvailableMethodQryExe.execute(serviceAvailableMethodQry);
+    }
+
+    /**
+     * 完成服务
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response complete(String uuid) {
+        ServiceStatusCmd serviceStatusCmd = new ServiceStatusCmd();
+        serviceStatusCmd.setUuid(uuid);
+        serviceStatusCmd.setReleaseStatus(ReleaseStatusEnum.PROCESSING);
+        return serviceStatusCmdExe.execute(serviceStatusCmd);
+    }
+
+    /**
+     * 撤销完成
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response revoke(String uuid) {
+        ServiceStatusCmd serviceStatusCmd = new ServiceStatusCmd();
+        serviceStatusCmd.setUuid(uuid);
+        serviceStatusCmd.setReleaseStatus(ReleaseStatusEnum.EDIT);
+        return serviceStatusCmdExe.execute(serviceStatusCmd);
+    }
+
+    /**
+     * 废弃
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response discard(String uuid) {
+        ServiceStatusCmd serviceStatusCmd = new ServiceStatusCmd();
+        serviceStatusCmd.setUuid(uuid);
+        serviceStatusCmd.setReleaseStatus(ReleaseStatusEnum.DISCARD);
+        return serviceStatusCmdExe.execute(serviceStatusCmd);
+    }
+
+    /**
+     * 删除
+     *
+     * @param uuid 编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response delete(String uuid) {
+        return serviceDelExe.execute(uuid);
     }
 }

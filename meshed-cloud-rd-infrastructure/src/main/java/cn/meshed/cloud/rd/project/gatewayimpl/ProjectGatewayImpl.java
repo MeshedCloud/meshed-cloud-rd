@@ -3,6 +3,7 @@ package cn.meshed.cloud.rd.project.gatewayimpl;
 import cn.meshed.cloud.context.SecurityContext;
 import cn.meshed.cloud.rd.domain.project.Project;
 import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
+import cn.meshed.cloud.rd.project.enums.ProjectStatusEnum;
 import cn.meshed.cloud.rd.project.enums.ProjectVisitTypeEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ProjectDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.mapper.ProjectMapper;
@@ -12,6 +13,7 @@ import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.PageUtils;
 import com.alibaba.cola.dto.PageResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -52,10 +54,26 @@ public class ProjectGatewayImpl implements ProjectGateway {
      */
     @Override
     public boolean existKey(String key) {
-        AssertUtils.isTrue(StringUtils.isNotBlank(key), "key 不能为空");
+        AssertUtils.isTrue(StringUtils.isNotBlank(key), "唯一标识不能为空");
         LambdaQueryWrapper<ProjectDO> lqw = new LambdaQueryWrapper<ProjectDO>();
         lqw.eq(ProjectDO::getKey, key.toUpperCase());
         return projectMapper.selectCount(lqw) > 0;
+    }
+
+    /**
+     * 判断项目Key是否已经存在
+     *
+     * @param key    项目key
+     * @param status 状态
+     * @return
+     */
+    @Override
+    public boolean updateStatus(String key, ProjectStatusEnum status) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(key), "唯一标识不能为空");
+        AssertUtils.isTrue(status != null, "状态不能为空");
+        LambdaUpdateWrapper<ProjectDO> luq = new LambdaUpdateWrapper<>();
+        luq.eq(ProjectDO::getKey, key).eq(ProjectDO::getStatus, status);
+        return projectMapper.update(null, luq) > 0;
     }
 
     /**

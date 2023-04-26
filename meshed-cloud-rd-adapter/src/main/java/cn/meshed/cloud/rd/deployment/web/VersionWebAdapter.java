@@ -47,4 +47,13 @@ public class VersionWebAdapter implements VersionAdapter {
     public Response publish(@Valid VersionCmd versionCmd) {
         return versionAbility.publish(versionCmd);
     }
+
+    /**
+     * @param aLong
+     * @return
+     */
+    @Override
+    public Response revoke(Long aLong) {
+        return null;
+    }
 }

@@ -66,7 +66,7 @@ public class VersionGatewayImpl implements VersionGateway {
         AssertUtils.isTrue(alreadyVersion != null, "变更版本不能为空");
         assert alreadyVersion != null;
         alreadyVersion.setStatus(version.getStatus());
-        alreadyVersion.setEnvironment(version.getEnvironments());
+        alreadyVersion.setEnvironments(version.getEnvironments());
         AssertUtils.isTrue(versionMapper.updateById(alreadyVersion) > 0, "版本变更失败");
         return CopyUtils.copy(alreadyVersion, Version.class);
     }

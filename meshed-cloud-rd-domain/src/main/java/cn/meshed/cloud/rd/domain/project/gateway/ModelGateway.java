@@ -1,11 +1,14 @@
 package cn.meshed.cloud.rd.domain.project.gateway;
 
 import cn.meshed.cloud.core.IBatchSave;
+import cn.meshed.cloud.core.IDelete;
 import cn.meshed.cloud.core.IPageList;
 import cn.meshed.cloud.core.IQuery;
 import cn.meshed.cloud.core.ISave;
 import cn.meshed.cloud.core.ISelect;
 import cn.meshed.cloud.rd.domain.project.Model;
+import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
+import cn.meshed.cloud.rd.project.enums.ServiceModelStatusEnum;
 import cn.meshed.cloud.rd.project.query.ModelPageQry;
 import com.alibaba.cola.dto.PageResponse;
 
@@ -19,7 +22,7 @@ import java.util.Set;
  */
 public interface ModelGateway extends ISave<Model, String>, IQuery<String, Model>,
         IBatchSave<Set<Model>, Integer>, ISelect<String, Set<String>>,
-        IPageList<ModelPageQry, PageResponse<Model>> {
+        IPageList<ModelPageQry, PageResponse<Model>>, IDelete<String, Boolean> {
 
     /**
      * 判断className是否在模型中是否已经存在
@@ -71,4 +74,39 @@ public interface ModelGateway extends ISave<Model, String>, IQuery<String, Model
      */
     boolean batchSaveOrUpdate(String projectKey, Set<Model> models);
 
+    /**
+     * 更新状态
+     *
+     * @param uuid          编码
+     * @param status        状态
+     * @param releaseStatus 发行状态
+     * @return 成功与否
+     */
+    boolean updateStatus(String uuid, ServiceModelStatusEnum status, ReleaseStatusEnum releaseStatus);
+
+    /**
+     * 批量更新状态
+     *
+     * @param uuids         编码列表
+     * @param status        状态
+     * @param releaseStatus 发行状态
+     * @return 成功与否
+     */
+    boolean batchUpdateStatus(Set<String> uuids, ServiceModelStatusEnum status, ReleaseStatusEnum releaseStatus);
+
+    /**
+     * 模型检查合法性
+     *
+     * @param uuid
+     * @return 合法性
+     */
+    boolean checkLegal(String uuid);
+
+    /**
+     * 通过类名检查模型合法性
+     *
+     * @param classNames 类名列表
+     * @return 合法性
+     */
+    boolean checkLegalByClassNames(Set<String> classNames);
 }

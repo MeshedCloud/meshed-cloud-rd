@@ -4,6 +4,7 @@ import cn.meshed.cloud.rd.domain.project.constant.TrendLogLevelEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -51,7 +52,13 @@ public class TrendLog implements Serializable {
     public TrendLog(String projectKey, TrendLogLevelEnum level, String message) {
         this.projectKey = projectKey;
         this.level = level;
-        this.message = message;
+        if (StringUtils.isNotBlank(message)) {
+            if (message.length() > 100) {
+                this.message = message.substring(0, 100);
+            } else {
+                this.message = message;
+            }
+        }
         this.time = LocalDateTime.now();
     }
 

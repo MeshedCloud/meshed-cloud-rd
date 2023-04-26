@@ -8,8 +8,10 @@ import cn.meshed.cloud.rd.domain.repo.CreateRepositoryGroup;
 import cn.meshed.cloud.rd.domain.repo.RepositoryGroup;
 import cn.meshed.cloud.rd.domain.repo.gateway.RepositoryGateway;
 import cn.meshed.cloud.rd.project.command.ProjectCmd;
+import cn.meshed.cloud.rd.project.config.WorkflowProperties;
 import cn.meshed.cloud.rd.project.enums.ProjectAccessModeEnum;
 import cn.meshed.cloud.rd.project.event.ProjectInitializeEvent;
+import cn.meshed.cloud.rd.wrapper.workflow.WorkflowWrapper;
 import cn.meshed.cloud.stream.StreamBridgeSender;
 import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.ResultUtils;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static cn.meshed.cloud.rd.domain.project.constant.MqConstant.APPROVE_PROJECT;
 import static cn.meshed.cloud.rd.domain.project.constant.MqConstant.PROJECT_INITIALIZE;
 
 /**
@@ -34,14 +37,11 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
 
     private final ProjectGateway projectGateway;
     private final StreamBridgeSender streamBridgeSender;
-
     private final RepositoryGateway repositoryGateway;
-
+    private final WorkflowWrapper workflowWrapper;
+    private final WorkflowProperties workflowProperties;
     @Value("${rd.project.group-format}")
     private String groupFormat;
-
-    @Value("${workflow.approve.enable:false}")
-    private boolean approveEnable;
 
     /**
      * 仅新增项目处理器
@@ -61,12 +61,15 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
         }
         //生成初始化事件信息
         ProjectInitializeEvent event = buildProjectInitializeEvent(projectCmd);
+
         //走审批流
-        if (approveEnable) {
+        if (workflowProperties.getEnable()) {
             initiateApproval(event);
         } else {
             //发起初始化事件
             streamBridgeSender.send(PROJECT_INITIALIZE, event);
+            //自动审批
+            streamBridgeSender.send(APPROVE_PROJECT, event);
         }
         return ResultUtils.ok();
     }
@@ -88,12 +91,12 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
     }
 
     /**
-     * todo 发起审批
+     * 发起审批
      *
      * @param event
      */
     private void initiateApproval(ProjectInitializeEvent event) {
-
+        workflowWrapper.initiate(workflowProperties.getProjectInitiation(), event);
     }
 
     private RepositoryGroup buildGroup(ProjectCmd projectCmd) {

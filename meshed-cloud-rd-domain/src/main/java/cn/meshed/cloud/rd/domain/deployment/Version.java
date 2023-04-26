@@ -32,6 +32,12 @@ public class Version implements Serializable {
      * 版本仓库项目名称
      */
     private String name;
+
+    /**
+     * 版本审批关联表
+     */
+    private String flowId;
+
     /**
      * 版本实体项目全称代号
      */

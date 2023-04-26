@@ -32,6 +32,11 @@ public class VersionDO extends BaseEntity {
     private Long id;
 
     /**
+     * 版本审批关联表
+     */
+    private String flowId;
+
+    /**
      * 版本来源编码（仓库编码）
      */
     private String sourceId;
@@ -39,7 +44,7 @@ public class VersionDO extends BaseEntity {
     /**
      * 版本环境
      */
-    private String environment;
+    private String environments;
 
     /**
      * 仓库版本号

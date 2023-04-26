@@ -1,5 +1,6 @@
 package cn.meshed.cloud.rd.domain.project.ability;
 
+import cn.meshed.cloud.core.IDelete;
 import cn.meshed.cloud.core.IDetails;
 import cn.meshed.cloud.core.IPageList;
 import cn.meshed.cloud.core.ISave;
@@ -22,7 +23,7 @@ import javax.validation.Valid;
  * @version 1.0
  */
 public interface ServiceAbility extends IPageList<ServicePageQry, PageResponse<ServiceDTO>>,
-        IDetails<String, SingleResponse<ServiceDetailDTO>>, ISave<ServiceCmd, Response> {
+        IDetails<String, SingleResponse<ServiceDetailDTO>>, ISave<ServiceCmd, Response>, IDelete<String, Response> {
 
     /**
      * jar统计
@@ -39,4 +40,28 @@ public interface ServiceAbility extends IPageList<ServicePageQry, PageResponse<S
      * @return 是否可用
      */
     Response availableMethodName(@Valid ServiceAvailableMethodQry serviceAvailableMethodQry);
+
+    /**
+     * 完成服务
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    Response complete(String uuid);
+
+    /**
+     * 撤销完成
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    Response revoke(String uuid);
+
+    /**
+     * 废弃
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    Response discard(String uuid);
 }

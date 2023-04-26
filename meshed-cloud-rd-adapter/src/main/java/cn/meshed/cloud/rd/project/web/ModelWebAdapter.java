@@ -96,4 +96,48 @@ public class ModelWebAdapter implements ModelAdapter {
         return SingleResponse.buildSuccess();
     }
 
+    /**
+     * 完成模型
+     *
+     * @param uuid 模型编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response complete(String uuid) {
+        return modelAbility.complete(uuid);
+    }
+
+    /**
+     * 撤销完成
+     *
+     * @param uuid 模型编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response revoke(String uuid) {
+        return modelAbility.revoke(uuid);
+    }
+
+    /**
+     * 废弃
+     *
+     * @param uuid 模型编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response discard(String uuid) {
+        return modelAbility.discard(uuid);
+    }
+
+    /**
+     * 删除（仅支持编辑中的模型）
+     *
+     * @param uuid 模型编码
+     * @return {@link Response}
+     */
+    @Override
+    public Response delete(String uuid) {
+        return modelAbility.delete(uuid);
+    }
+
 }

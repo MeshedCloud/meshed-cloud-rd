@@ -30,6 +30,7 @@ import static cn.meshed.cloud.rd.domain.common.constant.Constant.SRC_PATH;
 @Component
 public class RpcPublishHandler extends AbstractServicePublish implements PublishHandler<ServicePublish> {
 
+
     public RpcPublishHandler(ModelGateway modelGateway, CliGateway cliGateway) {
         super(modelGateway, cliGateway);
     }
@@ -56,9 +57,11 @@ public class RpcPublishHandler extends AbstractServicePublish implements Publish
         //转换为适配器
         Set<Rpc> rpcList = serviceGroups.stream().map(this::toRpc).collect(Collectors.toSet());
 
-        //新增接口
-        getCliGateway().asyncGenerateRpcWithPush(servicePublish.getSourceId(),
-                buildGenerateRpc(servicePublish, rpcList));
+        if (CollectionUtils.isNotEmpty(rpcList)) {
+            //新增接口
+            getCliGateway().asyncGenerateRpcWithPush(servicePublish.getSourceId(),
+                    buildGenerateRpc(servicePublish, rpcList));
+        }
     }
 
     @NotNull

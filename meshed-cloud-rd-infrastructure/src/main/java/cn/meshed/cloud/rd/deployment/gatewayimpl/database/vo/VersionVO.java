@@ -26,6 +26,10 @@ public class VersionVO implements Serializable {
      */
     private Long id;
     /**
+     * 版本审批关联表
+     */
+    private String flowId;
+    /**
      * 版本来源编码（仓库编码）
      */
     private String sourceId;

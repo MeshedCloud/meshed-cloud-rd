@@ -10,6 +10,11 @@ spring:
         initSystemConfig-in-0:
           destination: project-initialization
           group: systemConfig
+        approveProject:
+          destination: approve-project
+        approveProject-in-0:
+          destination: approve-project
+          group: project
         warehouseInitialize:
           destination: warehouse-initialize
         initWarehouseSkeleton-in-0:
@@ -23,5 +28,10 @@ spring:
         versionPublishStrategy-in-0:
           destination: version-publish
           group: version
+        versionPublishApprove:
+          destination: version-publish-approve
+        versionPublishApprove-in-0:
+          destination: version-publish-approve
+          group: version
       function:
-        definition: initProjectWarehouse;initSystemConfig;initWarehouseSkeleton;initWarehouseMember;versionPublishStrategy
+        definition: initProjectWarehouse;initSystemConfig;initWarehouseSkeleton;initWarehouseMember;versionPublishStrategy;versionPublishApprove;approveProject

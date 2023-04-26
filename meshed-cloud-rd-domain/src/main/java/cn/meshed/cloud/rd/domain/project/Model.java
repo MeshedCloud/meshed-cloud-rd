@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.meshed.cloud.rd.domain.project.constant.ProjectConstant.INIT_VERSION;
-import static cn.meshed.cloud.rd.domain.project.constant.ProjectConstant.MODEL_PACKAGE_NAME_FORMAT;
+import static cn.meshed.cloud.rd.domain.project.constant.ProjectConstant.PACKAGE_NAME_FORMAT;
 
 /**
  * <h1></h1>
@@ -146,15 +146,15 @@ public class Model implements Serializable {
     public void buildPackageName(String basePackage) {
         String sunPackageName = null;
         if (ModelTypeEnum.PAGE_PARAM == this.type) {
-            sunPackageName = ModelTypeEnum.PARAM.name().toLowerCase();
+            sunPackageName = ModelTypeEnum.PARAM.getExt().toLowerCase();
         }
         if (ModelTypeEnum.PAGE_REQUEST == this.type) {
-            sunPackageName = ModelTypeEnum.REQUEST.name().toLowerCase();
+            sunPackageName = ModelTypeEnum.REQUEST.getExt().toLowerCase();
         } else {
-            sunPackageName = this.type.name().toLowerCase();
+            sunPackageName = this.type.getExt().toLowerCase();
         }
 
-        this.packageName = String.format(MODEL_PACKAGE_NAME_FORMAT, basePackage, domainKey, sunPackageName, this.className);
+        this.packageName = String.format(PACKAGE_NAME_FORMAT, basePackage, domainKey, sunPackageName).toLowerCase() + this.className;
     }
 
     /**

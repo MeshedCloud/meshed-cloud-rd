@@ -1,5 +1,6 @@
 package cn.meshed.cloud.rd.domain.project.ability;
 
+import cn.meshed.cloud.core.IDelete;
 import cn.meshed.cloud.core.IDetails;
 import cn.meshed.cloud.core.IPageList;
 import cn.meshed.cloud.core.ISave;
@@ -23,7 +24,7 @@ import java.util.Set;
  * @version 1.0
  */
 public interface ModelAbility extends IPageList<ModelPageQry, PageResponse<ModelDTO>>,
-        IDetails<String, SingleResponse<ModelDetailDTO>>, ISave<ModelCmd, Response> {
+        IDetails<String, SingleResponse<ModelDetailDTO>>, ISave<ModelCmd, Response>, IDelete<String, Response> {
 
 
     /**
@@ -41,4 +42,29 @@ public interface ModelAbility extends IPageList<ModelPageQry, PageResponse<Model
      * @return {@link SingleResponse< List <String>>}
      */
     SingleResponse<Set<String>> select(String projectKey);
+
+    /**
+     * 完成服务
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    Response complete(String uuid);
+
+    /**
+     * 撤销完成
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    Response revoke(String uuid);
+
+    /**
+     * 废弃
+     *
+     * @param uuid 服务编码
+     * @return {@link Response}
+     */
+    Response discard(String uuid);
+
 }

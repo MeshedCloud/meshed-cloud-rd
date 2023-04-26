@@ -1,9 +1,9 @@
 package cn.meshed.cloud.rd.project.gatewayimpl.database.mapper;
 
+import cn.meshed.cloud.mysql.EasyMapper;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.vo.ServiceVO;
 import cn.meshed.cloud.rd.project.query.ServicePageQry;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * @author by Vincent Vic
  * @since 2023-02-27
  */
-public interface ServiceMapper extends BaseMapper<ServiceDO> {
+public interface ServiceMapper extends EasyMapper<ServiceDO> {
 
     /**
      * 查询分页

@@ -7,6 +7,7 @@ import cn.meshed.cloud.rd.codegen.ObjectParameter;
 import cn.meshed.cloud.rd.codegen.ObjectResponse;
 import cn.meshed.cloud.rd.codegen.constant.ParameterType;
 import cn.meshed.cloud.rd.domain.cli.gateway.CliGateway;
+import cn.meshed.cloud.rd.domain.common.VersionFormat;
 import cn.meshed.cloud.rd.domain.project.Field;
 import cn.meshed.cloud.rd.domain.project.Service;
 import cn.meshed.cloud.rd.domain.project.ServiceGroup;
@@ -140,7 +141,7 @@ public abstract class AbstractServicePublish {
         objectDefinition.setDescription(serviceGroup.getDescription());
         objectDefinition.setPackageName(serviceGroup.getPackageName());
         objectDefinition.setExplain(serviceGroup.getName());
-        objectDefinition.setVersion(serviceGroup.getVersion().toString());
+        objectDefinition.setVersion(VersionFormat.version(serviceGroup.getVersion()));
     }
 
     /**

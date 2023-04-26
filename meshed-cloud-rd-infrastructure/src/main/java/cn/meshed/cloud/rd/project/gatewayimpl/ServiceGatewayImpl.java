@@ -8,7 +8,9 @@ import cn.meshed.cloud.rd.domain.project.gateway.FieldGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
 import cn.meshed.cloud.rd.domain.project.gateway.ServiceGateway;
 import cn.meshed.cloud.rd.project.convertor.ServiceConvertor;
+import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.enums.RequestModeEnum;
+import cn.meshed.cloud.rd.project.enums.ServiceModelStatusEnum;
 import cn.meshed.cloud.rd.project.enums.ServiceTypeEnum;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceDO;
 import cn.meshed.cloud.rd.project.gatewayimpl.database.dataobject.ServiceGroupDO;
@@ -23,6 +25,7 @@ import cn.meshed.cloud.utils.PageUtils;
 import com.alibaba.cola.dto.PageResponse;
 import com.alibaba.cola.exception.SysException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -165,7 +168,6 @@ public class ServiceGatewayImpl implements ServiceGateway {
             return null;
         }
 
-
         ServiceDO serviceDO = ServiceConvertor.toEntity(service, queryByUuid(service.getUuid()));
 
         if (ServiceTypeEnum.API == service.getType()) {
@@ -258,19 +260,19 @@ public class ServiceGatewayImpl implements ServiceGateway {
      * 查询项目的待发布服务详情列表
      * 注：服务发布需要重建所属这个控制器全部方法，需要将同分组的服务方法一并查询出来
      *
-     * @param uuids uuids
+     * @param groupIds 分组ID列表
      * @return 服务列表
      */
     @Override
-    public Set<Service> listByUuids(Set<String> uuids) {
-        AssertUtils.isTrue(CollectionUtils.isNotEmpty(uuids), "uuid列表不能为空");
+    public Set<Service> listByGroupIds(Set<String> groupIds) {
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(groupIds), "uuid列表不能为空");
         LambdaQueryWrapper<ServiceDO> lqw = new LambdaQueryWrapper<>();
-        lqw.in(ServiceDO::getGroupId, uuids);
+        lqw.in(ServiceDO::getGroupId, groupIds);
         Set<Service> services = CopyUtils.copySetProperties(serviceMapper.selectList(lqw), Service::new);
         if (CollectionUtils.isEmpty(services)) {
             return services;
         }
-        uuids = services.stream().map(Service::getUuid).collect(Collectors.toSet());
+        Set<String> uuids = services.stream().map(Service::getUuid).collect(Collectors.toSet());
         Set<Field> fields = fieldGateway.listByServices(uuids);
         if (CollectionUtils.isNotEmpty(fields)) {
             Map<String, Set<Field>> fieldMap = fields.stream()
@@ -289,5 +291,79 @@ public class ServiceGatewayImpl implements ServiceGateway {
 
         return services;
     }
+
+    /**
+     * 更新状态
+     *
+     * @param uuid          编码
+     * @param status        状态
+     * @param releaseStatus 发行状态
+     * @return 成功与否
+     */
+    @Override
+    public boolean updateStatus(String uuid, ServiceModelStatusEnum status, ReleaseStatusEnum releaseStatus) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(uuid), "编码参数不能为空");
+        AssertUtils.isTrue(status != null || releaseStatus != null, "状态参数不能为空");
+        LambdaUpdateWrapper<ServiceDO> luw = new LambdaUpdateWrapper<>();
+        luw.set(status != null, ServiceDO::getStatus, status)
+                .set(releaseStatus != null, ServiceDO::getReleaseStatus, releaseStatus)
+                .eq(ServiceDO::getUuid, uuid);
+        return serviceMapper.update(null, luw) > 0;
+    }
+
+    /**
+     * 批量更新状态
+     *
+     * @param uuids         编码列表
+     * @param status        状态
+     * @param releaseStatus 发行状态
+     * @return 成功与否
+     */
+    @Override
+    public boolean batchUpdateStatus(Set<String> uuids, ServiceModelStatusEnum status, ReleaseStatusEnum releaseStatus) {
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(uuids), "关系列表不能为空");
+        AssertUtils.isTrue(status != null || releaseStatus != null, "状态不能为空");
+        List<ServiceDO> services = serviceMapper.selectBatchIds(uuids);
+        AssertUtils.isTrue(CollectionUtils.isNotEmpty(services), "不存在服务");
+        List<ServiceDO> list = services.stream().peek(serviceDO -> {
+            if (status != null) {
+                serviceDO.setStatus(status);
+            }
+            if (releaseStatus != null) {
+                serviceDO.setReleaseStatus(releaseStatus);
+            }
+        }).collect(Collectors.toList());
+        return serviceMapper.updateBatch(list) > 0;
+    }
+
+    /**
+     * 服务检查合法性
+     *
+     * @param uuids
+     * @return
+     */
+    @Override
+    public boolean checkLegal(String uuids) {
+        Set<Field> fields = fieldGateway.listByService(uuids);
+        //没有字段视为合法
+        if (CollectionUtils.isEmpty(fields)) {
+            return true;
+        }
+        Set<String> classNames = fields.stream().map(Field::getFieldType).collect(Collectors.toSet());
+        //检查是否存在类名还在编辑状态或者删除
+        return modelGateway.checkLegalByClassNames(classNames);
+    }
+
+    /**
+     * 删除
+     *
+     * @param uuid 编码
+     * @return
+     */
+    @Override
+    public Boolean delete(String uuid) {
+        return serviceMapper.deleteById(uuid) > 0;
+    }
+
 
 }
