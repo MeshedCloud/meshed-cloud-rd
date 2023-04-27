@@ -1,7 +1,7 @@
 package cn.meshed.cloud.rd.domain.log;
 
 import cn.meshed.cloud.aspect.ResolverKit;
-import cn.meshed.cloud.rd.domain.project.constant.TrendLogLevelEnum;
+import cn.meshed.cloud.rd.log.enums.TrendLogLevelEnum;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.exception.SysException;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,9 @@
 package cn.meshed.cloud.rd.domain.log;
 
-import cn.meshed.cloud.rd.domain.project.constant.TrendLogLevelEnum;
+import cn.meshed.cloud.rd.log.enums.TrendLogLevelEnum;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
  * @author by Vincent Vic
  * @since 2023-04-22
  */
-@Setter
-@Getter
+@NoArgsConstructor
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class TrendLog implements Serializable {
 

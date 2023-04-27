@@ -47,13 +47,10 @@ public class MavenSkeleton implements SkeletonEngine {
      */
     @Override
     public void build(Skeleton skeleton) {
-//校验
+        //校验
         skeleton.verification();
         //获取原型模板
         Archetype archetype = getArchetype(skeleton.getEngineTemplate());
-        if (archetype == null) {
-            throw new SysException("模板不存在");
-        }
         Artifact artifact = new Artifact(skeleton.getBasePackage(), skeleton.getRepositoryName(), true);
         artifact.addExtended("domain", "examples");
         artifact.addExtended("projectKey", skeleton.getProjectKey());
