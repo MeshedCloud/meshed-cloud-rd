@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import static cn.meshed.cloud.rd.domain.common.constant.Constant.SRC_PATH;
-import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.MASTER;
+import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.DEVELOP;
 import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.WORKSPACE;
 
 /**
@@ -50,7 +50,7 @@ public class ClientPublishHandler implements PublishHandler<Publish> {
     public void publish(Publish publish) {
         String projectKey = publish.getProjectKey();
         AssertUtils.isTrue(StringUtils.isNotBlank(projectKey), "项目key不允许为空");
-        Branch branch = new Branch(WORKSPACE, MASTER);
+        Branch branch = new Branch(WORKSPACE, DEVELOP);
         repositoryGateway.rebuildBranch(publish.getSourceId(), branch);
         //发布模型
         ModelPublish modelPublish = CopyUtils.copy(publish, ModelPublish.class);

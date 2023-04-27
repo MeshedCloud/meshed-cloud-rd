@@ -2,14 +2,23 @@ package cn.meshed.cloud.rd.deployment.executor.command;
 
 import cn.meshed.cloud.cqrs.EventExecute;
 import cn.meshed.cloud.rd.deployment.enums.EnvironmentEnum;
+import cn.meshed.cloud.rd.deployment.enums.PackagesTypeEnum;
 import cn.meshed.cloud.rd.deployment.enums.PublishTypeEnum;
 import cn.meshed.cloud.rd.deployment.enums.VersionStatusEnum;
+import cn.meshed.cloud.rd.deployment.enums.WarehousePurposeTypeEnum;
 import cn.meshed.cloud.rd.deployment.event.VersionPublishEvent;
+import cn.meshed.cloud.rd.domain.common.VersionFormat;
+import cn.meshed.cloud.rd.domain.deployment.Packages;
 import cn.meshed.cloud.rd.domain.deployment.Version;
 import cn.meshed.cloud.rd.domain.deployment.VersionOccupy;
 import cn.meshed.cloud.rd.domain.deployment.VersionOccupyGateway;
+import cn.meshed.cloud.rd.domain.deployment.Warehouse;
+import cn.meshed.cloud.rd.domain.deployment.gateway.PackagesGateway;
 import cn.meshed.cloud.rd.domain.deployment.gateway.VersionGateway;
+import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
 import cn.meshed.cloud.rd.domain.log.Trend;
+import cn.meshed.cloud.rd.domain.project.Project;
+import cn.meshed.cloud.rd.domain.project.gateway.ProjectGateway;
 import cn.meshed.cloud.rd.project.command.ServiceModelPublishCmd;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
 import cn.meshed.cloud.rd.project.enums.ServiceModelTypeEnum;
@@ -21,6 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +52,9 @@ public class VersionPublishApproveEventExe implements EventExecute<VersionPublis
 
     private final VersionGateway versionGateway;
     private final VersionOccupyGateway versionOccupyGateway;
+    private final ProjectGateway projectGateway;
+    private final WarehouseGateway warehouseGateway;
+    private final PackagesGateway packagesGateway;
     private final ServiceModelPublishCmdExe serviceModelPublishCmdExe;
 
     /**
@@ -70,7 +83,29 @@ public class VersionPublishApproveEventExe implements EventExecute<VersionPublis
         version.setStatus(VersionStatusEnum.PUBLISHED);
         version.setFlowId("");
         versionGateway.change(version);
+
+        //记录制品信息
+        Warehouse warehouse = warehouseGateway.query(versionPublishEvent.getSourceId());
+        if (warehouse != null && (warehouse.getPurposeType() == WarehousePurposeTypeEnum.CLIENT
+                || warehouse.getPurposeType() == WarehousePurposeTypeEnum.ASSEMBLY)) {
+            Project project = projectGateway.queryByKey(versionPublishEvent.getProjectKey());
+            AssertUtils.isTrue(project != null, "项目不存在");
+            assert project != null;
+            Packages packages = new Packages(warehouse.getName(), project.getBasePackage(), warehouse.getRepoName(),
+                    getVersion(versionPublishEvent, warehouse), project.getKey(), PackagesTypeEnum.MAVEN);
+            packagesGateway.save(packages);
+        }
+
         return ResultUtils.ok();
+    }
+
+    @NotNull
+    private String getVersion(VersionPublishEvent versionPublishEvent, Warehouse warehouse) {
+        String version = VersionFormat.version(warehouse.getVersion());
+        if (versionPublishEvent.getEnvironment() == EnvironmentEnum.SNAPSHOT) {
+            return version + "-" + versionPublishEvent.getEnvironment().name();
+        }
+        return version;
     }
 
     private void handleServiceModelVersionOccupy(VersionPublishEvent versionPublishEvent, Version version) {
