@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * <h1></h1>
+ * <h1>用户RPC包装类</h1>
  *
  * @author Vincent Vic
  * @version 1.0

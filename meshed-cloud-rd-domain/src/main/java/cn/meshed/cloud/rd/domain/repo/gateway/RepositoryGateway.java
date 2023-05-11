@@ -7,6 +7,7 @@ import cn.meshed.cloud.rd.domain.repo.CreateRepository;
 import cn.meshed.cloud.rd.domain.repo.CreateRepositoryGroup;
 import cn.meshed.cloud.rd.domain.repo.ListRepositoryTree;
 import cn.meshed.cloud.rd.domain.repo.Repository;
+import cn.meshed.cloud.rd.domain.repo.RepositoryBlob;
 import cn.meshed.cloud.rd.domain.repo.RepositoryGroup;
 import cn.meshed.cloud.rd.domain.repo.RepositoryTreeItem;
 
@@ -61,6 +62,15 @@ public interface RepositoryGateway {
      */
     Integer commitRepositoryFile(CommitRepositoryFile commitRepositoryFile);
 
+
+    /**
+     * 分支列表
+     *
+     * @param repositoryId 仓库ID
+     * @return 分支列表
+     */
+    List<String> branchList(String repositoryId);
+
     /**
      * 创建分支
      *
@@ -106,4 +116,13 @@ public interface RepositoryGateway {
      * @return 成功与否
      */
     boolean deleteGroupMember(String repositoryId, String repoUid);
+
+    /**
+     * 获取文件
+     *
+     * @param repositoryId   仓库ID
+     * @param repositoryBlob 文件参数
+     * @return 文件内容
+     */
+    String getBlob(String repositoryId, RepositoryBlob repositoryBlob);
 }

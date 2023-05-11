@@ -72,7 +72,7 @@ public class ProjectGatewayImpl implements ProjectGateway {
         AssertUtils.isTrue(StringUtils.isNotBlank(key), "唯一标识不能为空");
         AssertUtils.isTrue(status != null, "状态不能为空");
         LambdaUpdateWrapper<ProjectDO> luq = new LambdaUpdateWrapper<>();
-        luq.eq(ProjectDO::getKey, key).eq(ProjectDO::getStatus, status);
+        luq.eq(ProjectDO::getKey, key).set(ProjectDO::getStatus, status);
         return projectMapper.update(null, luq) > 0;
     }
 
@@ -101,11 +101,14 @@ public class ProjectGatewayImpl implements ProjectGateway {
     public PageResponse<Project> searchPageList(ProjectPageQry pageQry) {
         Page<Object> page = PageUtils.startPage(pageQry);
         LambdaQueryWrapper<ProjectDO> lqw = new LambdaQueryWrapper<>();
-        lqw.like(StringUtils.isNotBlank(pageQry.getKeyword()), ProjectDO::getName, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ProjectDO::getDescription, pageQry.getKeyword())
-                .like(StringUtils.isNotBlank(pageQry.getKeyword()), ProjectDO::getKey, pageQry.getKeyword())
+        lqw
                 .eq(pageQry.getType() != null, ProjectDO::getType, pageQry.getType())
-                .eq(pageQry.getAccessMode() != null, ProjectDO::getAccessMode, pageQry.getAccessMode());
+                .eq(pageQry.getAccessMode() != null, ProjectDO::getAccessMode, pageQry.getAccessMode())
+                .and(StringUtils.isNotBlank(pageQry.getKeyword()), wrapper -> {
+                    wrapper.like(ProjectDO::getName, pageQry.getKeyword())
+                            .or().like(ProjectDO::getDescription, pageQry.getKeyword())
+                            .or().like(ProjectDO::getKey, pageQry.getKeyword());
+                }).orderByAsc(ProjectDO::getName);
 
         if (pageQry.getVisitType() != null) {
             handleVisitType(lqw, pageQry);

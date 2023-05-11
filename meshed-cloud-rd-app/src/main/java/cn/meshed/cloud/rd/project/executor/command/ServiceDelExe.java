@@ -36,7 +36,7 @@ public class ServiceDelExe implements CommandExecute<String, Response> {
         AssertUtils.isTrue(service != null, "服务不存在");
         assert service != null;
         AssertUtils.isTrue(ReleaseStatusEnum.EDIT == service.getReleaseStatus(), "非编辑状态无法删除");
-        return ResultUtils.of(serviceGateway.delete(uuid));
+        return ResultUtils.of(serviceGateway.delete(uuid), "删除失败");
     }
 
 }

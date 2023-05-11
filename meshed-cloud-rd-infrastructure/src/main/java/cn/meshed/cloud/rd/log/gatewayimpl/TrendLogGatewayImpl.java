@@ -49,7 +49,7 @@ public class TrendLogGatewayImpl implements TrendLogGateway {
     public PageResponse<TrendLog> searchPageList(TrendPageQry pageQry) {
         Page<Object> page = PageUtils.startPage(pageQry);
         LambdaQueryWrapper<TrendLogDO> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(StringUtils.isNotBlank(pageQry.getProjectKey()), TrendLogDO::getProjectKey, pageQry.getProjectKey());
+        lqw.eq(StringUtils.isNotBlank(pageQry.getProjectKey()), TrendLogDO::getProjectKey, pageQry.getProjectKey().toUpperCase());
         return PageUtils.of(trendLogMapper.selectList(lqw), page, TrendLog::new);
     }
 }

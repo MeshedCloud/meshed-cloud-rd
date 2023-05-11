@@ -27,4 +27,12 @@ public interface WarehouseGateway extends IPageList<WarehousePageQry, PageRespon
      * @return
      */
     boolean existWarehouseName(String warehouseName);
+
+    /**
+     * 根据物理仓库ID查询仓库信息
+     *
+     * @param repoId 物理仓库ID
+     * @return {@link Warehouse}
+     */
+    Warehouse queryByRepoId(String repoId);
 }

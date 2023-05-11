@@ -4,4 +4,4 @@
  * @version 1.0
  * @author Vincent Vic
  */
-package cn.meshed.cloud.rd.log.wap;
+package cn.meshed.cloud.rd.repo.remote;

@@ -14,11 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +41,8 @@ public class WaitPublishLegalQryExe implements QueryExecute<String, Response> {
     public Response execute(String projectKey) {
         Set<ServiceGroup> serviceGroups = serviceGroupGateway.waitPublishListByProject(projectKey);
         Set<Model> models = modelGateway.waitPublishModelListByProject(projectKey);
+        Set<Model> enums = modelGateway.waitPublishEnumListByProject(projectKey);
+        models.addAll(enums);
         if (CollectionUtils.isEmpty(serviceGroups) && CollectionUtils.isEmpty(models)) {
             return ResultUtils.fail("不存在待发布模型和服务");
         }
@@ -64,7 +62,7 @@ public class WaitPublishLegalQryExe implements QueryExecute<String, Response> {
             Set<String> set = models.stream().map(Model::getClassName).collect(Collectors.toSet());
             classNames.addAll(set);
         }
-        return ResultUtils.of(modelGateway.checkLegalByClassNames(classNames));
+        return ResultUtils.of(modelGateway.checkLegalByClassNames(classNames), "类名存在");
     }
 
     private List<Field> toField(Service service) {

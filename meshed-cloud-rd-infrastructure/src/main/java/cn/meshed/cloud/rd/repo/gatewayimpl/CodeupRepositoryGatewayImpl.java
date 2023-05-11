@@ -8,6 +8,7 @@ import cn.meshed.cloud.rd.domain.repo.CreateRepository;
 import cn.meshed.cloud.rd.domain.repo.CreateRepositoryGroup;
 import cn.meshed.cloud.rd.domain.repo.ListRepositoryTree;
 import cn.meshed.cloud.rd.domain.repo.Repository;
+import cn.meshed.cloud.rd.domain.repo.RepositoryBlob;
 import cn.meshed.cloud.rd.domain.repo.RepositoryFile;
 import cn.meshed.cloud.rd.domain.repo.RepositoryGroup;
 import cn.meshed.cloud.rd.domain.repo.RepositoryTreeItem;
@@ -30,9 +31,14 @@ import com.aliyun.devops20210625.models.CreateRepositoryResponse;
 import com.aliyun.devops20210625.models.CreateRepositoryResponseBody;
 import com.aliyun.devops20210625.models.DeleteBranchRequest;
 import com.aliyun.devops20210625.models.DeleteGroupMemberRequest;
+import com.aliyun.devops20210625.models.GetFileBlobsRequest;
+import com.aliyun.devops20210625.models.GetFileBlobsResponse;
 import com.aliyun.devops20210625.models.GetRepositoryRequest;
 import com.aliyun.devops20210625.models.GetRepositoryResponse;
 import com.aliyun.devops20210625.models.GetRepositoryResponseBody;
+import com.aliyun.devops20210625.models.ListRepositoryBranchesRequest;
+import com.aliyun.devops20210625.models.ListRepositoryBranchesResponse;
+import com.aliyun.devops20210625.models.ListRepositoryBranchesResponseBody;
 import com.aliyun.devops20210625.models.ListRepositoryTreeRequest;
 import com.aliyun.devops20210625.models.ListRepositoryTreeResponse;
 import com.aliyun.devops20210625.models.ListRepositoryTreeResponseBody;
@@ -196,7 +202,13 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
     public List<RepositoryTreeItem> listRepositoryTree(ListRepositoryTree listRepositoryTree) {
         ListRepositoryTreeRequest listRepositoryTreeRequest = new ListRepositoryTreeRequest();
         listRepositoryTreeRequest.setOrganizationId(organizationId);
-        listRepositoryTreeRequest.setType(ListRepositoryTreeType.RECURSIVE.name());
+        listRepositoryTreeRequest.setRefName(listRepositoryTree.getRefName());
+        listRepositoryTreeRequest.setPath(listRepositoryTree.getPath());
+        if (listRepositoryTree.getType() == null) {
+            listRepositoryTreeRequest.setType(ListRepositoryTreeType.DIRECT.name());
+        } else {
+            listRepositoryTreeRequest.setType(listRepositoryTree.getType().name());
+        }
         try {
             ListRepositoryTreeResponse listTreeResponse
                     = client.listRepositoryTree(String.valueOf(listRepositoryTree.getRepositoryId()),
@@ -241,6 +253,31 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
     }
 
     /**
+     * 分支列表
+     *
+     * @param repositoryId 仓库ID
+     * @return 分支列表
+     */
+    @Override
+    public List<String> branchList(String repositoryId) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
+        ListRepositoryBranchesRequest listRepositoryBranchesRequest = new ListRepositoryBranchesRequest();
+        listRepositoryBranchesRequest.setOrganizationId(organizationId);
+        try {
+            ListRepositoryBranchesResponse branchesResponse = client.listRepositoryBranches(repositoryId, listRepositoryBranchesRequest);
+            List<ListRepositoryBranchesResponseBody.ListRepositoryBranchesResponseBodyResult> results = branchesResponse.getBody().getResult();
+            if (branchesResponse.getBody().getSuccess() && CollectionUtils.isNotEmpty(results)) {
+                return results.stream()
+                        .map(ListRepositoryBranchesResponseBody.ListRepositoryBranchesResponseBodyResult::getName)
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            log.error("{} branch list query fail : {} ", repositoryId, e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
+    /**
      * 创建分支
      *
      * @param branch 分支
@@ -248,6 +285,7 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
      */
     @Override
     public boolean createBranch(String repositoryId, Branch branch) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
         CreateBranchRequest createBranchRequest = new CreateBranchRequest();
         createBranchRequest.setOrganizationId(organizationId);
         createBranchRequest.setRef(branch.getRef());
@@ -276,6 +314,7 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
      */
     @Override
     public boolean rebuildBranch(String repositoryId, Branch branch) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
         //删除已有的分支
         deleteBranch(repositoryId, branch.getBranchName());
         //构建新的分支
@@ -295,6 +334,7 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
      */
     @Override
     public boolean deleteBranch(String repositoryId, String branch) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
         AssertUtils.isTrue(!MASTER.equals(branch), "主分支不允许删除");
         AssertUtils.isTrue(!DEVELOP.equals(branch), "开发分支不允许删除");
         DeleteBranchRequest deleteBranchRequest = new DeleteBranchRequest();
@@ -357,6 +397,37 @@ public class CodeupRepositoryGatewayImpl implements RepositoryGateway {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 获取文件
+     *
+     * @param repositoryId   仓库ID
+     * @param repositoryBlob 文件参数
+     * @return 文件内容
+     */
+    @Override
+    public String getBlob(String repositoryId, RepositoryBlob repositoryBlob) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryId), "仓库ID不能为空");
+        AssertUtils.isTrue(StringUtils.isNotBlank(repositoryBlob.getPath()), "仓库ID不能为空");
+        GetFileBlobsRequest getFileBlobsRequest = new GetFileBlobsRequest();
+        getFileBlobsRequest.setOrganizationId(organizationId);
+        if (StringUtils.isNotBlank(repositoryBlob.getRefName())) {
+            getFileBlobsRequest.setRef(repositoryBlob.getRefName());
+        } else {
+            getFileBlobsRequest.setRef("master");
+        }
+        getFileBlobsRequest.setFilePath(repositoryBlob.getPath());
+
+        try {
+            GetFileBlobsResponse fileBlobs = client.getFileBlobs(repositoryId, getFileBlobsRequest);
+            if (fileBlobs.getBody().getSuccess()) {
+                return fileBlobs.getBody().getResult().getContent();
+            }
+        } catch (Exception e) {
+            log.error("{} get Blob fail : {} ", repositoryBlob, e.getMessage());
+        }
+        return null;
     }
 
     /**

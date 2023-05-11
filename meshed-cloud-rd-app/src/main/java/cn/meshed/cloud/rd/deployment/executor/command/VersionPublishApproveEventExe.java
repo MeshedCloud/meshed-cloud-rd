@@ -1,18 +1,10 @@
 package cn.meshed.cloud.rd.deployment.executor.command;
 
 import cn.meshed.cloud.cqrs.EventExecute;
-import cn.meshed.cloud.rd.deployment.enums.EnvironmentEnum;
-import cn.meshed.cloud.rd.deployment.enums.PackagesTypeEnum;
-import cn.meshed.cloud.rd.deployment.enums.PublishTypeEnum;
-import cn.meshed.cloud.rd.deployment.enums.VersionStatusEnum;
-import cn.meshed.cloud.rd.deployment.enums.WarehousePurposeTypeEnum;
+import cn.meshed.cloud.rd.deployment.enums.*;
 import cn.meshed.cloud.rd.deployment.event.VersionPublishEvent;
 import cn.meshed.cloud.rd.domain.common.VersionFormat;
-import cn.meshed.cloud.rd.domain.deployment.Packages;
-import cn.meshed.cloud.rd.domain.deployment.Version;
-import cn.meshed.cloud.rd.domain.deployment.VersionOccupy;
-import cn.meshed.cloud.rd.domain.deployment.VersionOccupyGateway;
-import cn.meshed.cloud.rd.domain.deployment.Warehouse;
+import cn.meshed.cloud.rd.domain.deployment.*;
 import cn.meshed.cloud.rd.domain.deployment.gateway.PackagesGateway;
 import cn.meshed.cloud.rd.domain.deployment.gateway.VersionGateway;
 import cn.meshed.cloud.rd.domain.deployment.gateway.WarehouseGateway;
@@ -67,7 +59,7 @@ public class VersionPublishApproveEventExe implements EventExecute<VersionPublis
     @Transactional
     @Override
     public Response execute(VersionPublishEvent versionPublishEvent) {
-        log.info("版本审批事件 {}", JSONObject.toJSONString(versionPublishEvent));
+        log.info("版本审批事件: {}", JSONObject.toJSONString(versionPublishEvent));
         Version version = versionGateway.query(versionPublishEvent.getVersionId());
         AssertUtils.isTrue(version != null, "版本不能为空");
         //修改相关版本状态

@@ -10,6 +10,7 @@ import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.exception.SysException;
+import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,7 @@ public class WarehouseInitializeSkeletonEventExe implements EventExecute<Warehou
     @Trend(key = "#{warehouseInitializeEvent.projectKey}", content = "#{warehouseInitializeEvent.repositoryName}+初始化")
     @Override
     public Response execute(WarehouseInitializeEvent warehouseInitializeEvent) {
-        System.out.println("skeleton test");
+        log.info("仓库初始化事件【脚手架消费者】: {}", JSONObject.toJSONString(warehouseInitializeEvent));
 
         //参数校验
         if (StringUtils.isBlank(warehouseInitializeEvent.getProjectKey())) {

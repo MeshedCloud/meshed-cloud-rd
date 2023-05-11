@@ -1,5 +1,6 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
+import cn.hutool.json.JSONUtil;
 import cn.meshed.cloud.cqrs.CommandExecute;
 import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.domain.project.Project;
@@ -17,6 +18,7 @@ import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,7 @@ import static cn.meshed.cloud.rd.domain.project.constant.MqConstant.PROJECT_INIT
  * @author Vincent Vic
  * @version 1.0
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
@@ -96,12 +99,13 @@ public class ProjectCmdExe implements CommandExecute<ProjectCmd, Response> {
      * @param event
      */
     private void initiateApproval(ProjectInitializeEvent event) {
+        log.info("产生项目发布工作流事件: {}", JSONUtil.toJsonStr(event));
         workflowWrapper.initiate(workflowProperties.getProjectInitiation(), event);
     }
 
     private RepositoryGroup buildGroup(ProjectCmd projectCmd) {
         CreateRepositoryGroup createRepositoryGroup = new CreateRepositoryGroup();
-        createRepositoryGroup.setGroupName(String.format(groupFormat, projectCmd.getKey()));
+        createRepositoryGroup.setGroupName(String.format(groupFormat, projectCmd.getKey()).toLowerCase());
         createRepositoryGroup.setVisible(getProjectVisible(projectCmd));
         createRepositoryGroup.setDescription(projectCmd.getDescription());
         return repositoryGateway.createRepositoryGroup(createRepositoryGroup);

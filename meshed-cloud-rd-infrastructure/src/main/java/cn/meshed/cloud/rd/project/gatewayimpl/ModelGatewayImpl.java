@@ -30,13 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +60,7 @@ public class ModelGatewayImpl implements ModelGateway {
         Page<Object> page = PageUtils.startPage(pageQry);
         LambdaQueryWrapper<ModelDO> lqw = new LambdaQueryWrapper<>();
         lqw.ne(ModelDO::getAccessMode, ModelAccessModeEnum.PRIVATE)
+                .eq(StringUtils.isNotBlank(pageQry.getProjectKey()), ModelDO::getProjectKey, pageQry.getProjectKey())
                 .eq(pageQry.getReleaseStatus() != null, ModelDO::getReleaseStatus, pageQry.getReleaseStatus())
                 .eq(pageQry.getType() != null, ModelDO::getType, pageQry.getType())
                 .and(StringUtils.isNotBlank(pageQry.getKeyword()), queryWrapper -> {
@@ -410,7 +405,7 @@ public class ModelGatewayImpl implements ModelGateway {
     public Set<Model> waitPublishModelListByProject(String projectKey) {
         Set<Model> models = getWaitPublishModels(projectKey, false);
         if (CollectionUtils.isEmpty(models)) {
-            return models;
+            return new HashSet<>();
         }
         return assembleModelDetailsList(models);
     }
@@ -426,7 +421,7 @@ public class ModelGatewayImpl implements ModelGateway {
     public Set<Model> waitPublishEnumListByProject(String projectKey) {
         Set<Model> models = getWaitPublishModels(projectKey, true);
         if (CollectionUtils.isEmpty(models)) {
-            return models;
+            return new HashSet<>();
         }
         return assembleEnumDetailsList(models);
     }
@@ -457,7 +452,7 @@ public class ModelGatewayImpl implements ModelGateway {
     public Set<String> scanPackageNameByClassNames(Set<String> classNames) {
         List<ModelDO> list = getModelSimpleListByClassNames(classNames);
         if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptySet();
+            return new HashSet<>();
         }
         return list.stream().map(ModelDO::getPackageName).collect(Collectors.toSet());
     }

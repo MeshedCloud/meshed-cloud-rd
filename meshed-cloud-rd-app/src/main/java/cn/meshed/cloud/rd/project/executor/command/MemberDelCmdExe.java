@@ -26,6 +26,6 @@ public class MemberDelCmdExe implements CommandExecute<Integer, Response> {
      */
     @Override
     public Response execute(Integer id) {
-        return ResultUtils.of(memberGateway.delete(id));
+        return ResultUtils.of(memberGateway.delete(id), "删除失败");
     }
 }

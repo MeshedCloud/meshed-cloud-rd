@@ -48,7 +48,7 @@ public class ModelStatusCmdExe implements CommandExecute<ModelStatusCmd, Respons
         }
         boolean op = modelGateway.updateStatus(modelStatusCmd.getUuid(),
                 modelStatusCmd.getStatus(), modelStatusCmd.getReleaseStatus());
-        return ResultUtils.of(op);
+        return ResultUtils.of(op, "修改失败");
     }
 
 

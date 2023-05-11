@@ -30,7 +30,7 @@ public class ProjectApproveEventExe implements CommandExecute<ProjectInitializeE
      * @param projectInitializeEvent 项目初始化实际参数
      * @return
      */
-    @Trend(key = "#{projectCmd.key}", content = "#{projectInitializeEvent.name}+项目立项通过")
+    @Trend(key = "#{projectInitializeEvent.key}", content = "#{projectInitializeEvent.name}+项目立项通过")
     @Override
     public Response execute(ProjectInitializeEvent projectInitializeEvent) {
         Project project = projectGateway.queryByKey(projectInitializeEvent.getKey());

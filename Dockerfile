@@ -7,6 +7,7 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 #声明一个挂载点，容器内此路径会对应宿主机的某个文件夹
 VOLUME /tmp/rd
+VOLUME ["/root/.m2"]
 
 #应用构建成功后的jar文件被复制到镜像内，名字也改成了app.jar
 ADD start/target/*.jar app.jar

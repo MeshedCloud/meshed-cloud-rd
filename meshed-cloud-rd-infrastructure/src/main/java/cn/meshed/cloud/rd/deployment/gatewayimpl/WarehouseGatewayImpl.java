@@ -73,6 +73,19 @@ public class WarehouseGatewayImpl implements WarehouseGateway {
     }
 
     /**
+     * 根据物理仓库ID查询仓库信息
+     *
+     * @param repoId 物理仓库ID
+     * @return {@link Warehouse}
+     */
+    @Override
+    public Warehouse queryByRepoId(String repoId) {
+        LambdaQueryWrapper<WarehouseDO> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(WarehouseDO::getRepoId, repoId);
+        return CopyUtils.copy(warehouseMapper.selectOne(lqw), Warehouse.class);
+    }
+
+    /**
      * 查询
      *
      * @param uuid 参数

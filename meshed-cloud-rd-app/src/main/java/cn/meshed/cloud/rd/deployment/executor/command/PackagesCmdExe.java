@@ -52,6 +52,6 @@ public class PackagesCmdExe implements CommandExecute<PackagesCmd, Response> {
         packages.setProjectKey(key);
         packages.setType(PackagesTypeEnum.MAVEN);
 
-        return ResultUtils.of(packagesGateway.save(packages));
+        return ResultUtils.of(packagesGateway.save(packages), "保存失败");
     }
 }

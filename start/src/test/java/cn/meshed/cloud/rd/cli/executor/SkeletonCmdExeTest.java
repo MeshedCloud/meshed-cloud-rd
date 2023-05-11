@@ -2,6 +2,7 @@ package cn.meshed.cloud.rd.cli.executor;
 
 import cn.meshed.cloud.rd.ProviderApplication;
 import cn.meshed.cloud.rd.cli.executor.command.SkeletonCmdExe;
+import cn.meshed.cloud.rd.domain.cli.EngineTemplate;
 import cn.meshed.cloud.rd.domain.cli.Skeleton;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,12 @@ public class SkeletonCmdExeTest {
         skeleton.setRepositoryName("meshed-cloud-property-client");
         skeleton.setBasePackage("cn.meshed.cloud.property");
         skeleton.setProjectKey("PROPERTY");
-//        skeleton.setEngineTemplate("meshed-cloud-client-archetype");
+        EngineTemplate engineTemplate = new EngineTemplate();
+        engineTemplate.setId("meshed-cloud-archetype");
+        engineTemplate.setType(EngineTemplate.EngineTemplateType.MAVEN);
+        engineTemplate.setOrigin("cn.meshed.archetype");
+        engineTemplate.setTag("1.0.0-SNAPSHOT");
+        skeleton.setEngineTemplate(engineTemplate);
         skeleton.setRepositoryId("3243305");
         skeletonCmdExe.execute(skeleton);
     }

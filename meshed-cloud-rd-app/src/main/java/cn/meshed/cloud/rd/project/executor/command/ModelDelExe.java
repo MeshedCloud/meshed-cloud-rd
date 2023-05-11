@@ -36,7 +36,7 @@ public class ModelDelExe implements CommandExecute<String, Response> {
         AssertUtils.isTrue(model != null, "模型不存在");
         assert model != null;
         AssertUtils.isTrue(ReleaseStatusEnum.EDIT == model.getReleaseStatus(), "非编辑状态无法删除");
-        return ResultUtils.of(modelGateway.delete(uuid));
+        return ResultUtils.of(modelGateway.delete(uuid), "刪除失敗");
     }
 
 }

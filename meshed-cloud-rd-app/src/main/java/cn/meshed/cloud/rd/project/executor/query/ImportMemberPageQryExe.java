@@ -1,8 +1,8 @@
 package cn.meshed.cloud.rd.project.executor.query;
 
-import cn.meshed.cloud.constant.Status;
 import cn.meshed.cloud.cqrs.QueryExecute;
 import cn.meshed.cloud.iam.account.data.AccountDTO;
+import cn.meshed.cloud.iam.account.enums.AccountStatusEnum;
 import cn.meshed.cloud.iam.account.query.AccountPageQry;
 import cn.meshed.cloud.rd.domain.project.gateway.MemberGateway;
 import cn.meshed.cloud.rd.project.data.MemberDTO;
@@ -38,7 +38,7 @@ public class ImportMemberPageQryExe implements QueryExecute<ImportMemberPageQry,
     @Override
     public PageResponse<MemberDTO> execute(ImportMemberPageQry pageQry) {
         AccountPageQry accountPageQry = new AccountPageQry();
-        accountPageQry.setStatus(Status.VALID);
+        accountPageQry.setStatus(AccountStatusEnum.VALID);
         accountPageQry.setPageIndex(pageQry.getPageIndex());
         accountPageQry.setPageSize(pageQry.getPageSize());
         PageResponse<AccountDTO> pageResponse = userWrapper.list(accountPageQry);

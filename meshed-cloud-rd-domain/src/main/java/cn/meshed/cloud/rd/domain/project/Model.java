@@ -2,11 +2,7 @@ package cn.meshed.cloud.rd.domain.project;
 
 import cn.hutool.core.util.StrUtil;
 import cn.meshed.cloud.context.SecurityContext;
-import cn.meshed.cloud.rd.project.enums.ModelAccessModeEnum;
-import cn.meshed.cloud.rd.project.enums.ModelTypeEnum;
-import cn.meshed.cloud.rd.project.enums.ProjectAccessModeEnum;
-import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
-import cn.meshed.cloud.rd.project.enums.ServiceModelStatusEnum;
+import cn.meshed.cloud.rd.project.enums.*;
 import cn.meshed.cloud.utils.AssertUtils;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -19,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.meshed.cloud.rd.domain.project.constant.ProjectConstant.INIT_VERSION;
-import static cn.meshed.cloud.rd.domain.project.constant.ProjectConstant.PACKAGE_NAME_FORMAT;
+import static cn.meshed.cloud.rd.domain.project.constant.ProjectConstant.MODEL_PACKAGE_NAME_FORMAT;
 
 /**
  * <h1></h1>
@@ -71,6 +67,7 @@ public class Model implements Serializable {
     /**
      * 模型所属领域key
      */
+    @Setter(AccessLevel.NONE)
     private String domainKey;
 
     /**
@@ -118,6 +115,11 @@ public class Model implements Serializable {
         this.projectKey = StringUtils.upperCase(projectKey);
     }
 
+    public void setDomainKey(String domainKey) {
+        AssertUtils.isTrue(StringUtils.isNotBlank(domainKey), "领域标识不能为空");
+        this.domainKey = StringUtils.upperCase(domainKey);
+    }
+
     public void initModel(Project project, String classNamePrefix) {
         this.accessMode = convertorAccessMode(project.getAccessMode());
         initModel(classNamePrefix);
@@ -146,15 +148,14 @@ public class Model implements Serializable {
     public void buildPackageName(String basePackage) {
         String sunPackageName = null;
         if (ModelTypeEnum.PAGE_PARAM == this.type) {
-            sunPackageName = ModelTypeEnum.PARAM.getExt().toLowerCase();
-        }
-        if (ModelTypeEnum.PAGE_REQUEST == this.type) {
-            sunPackageName = ModelTypeEnum.REQUEST.getExt().toLowerCase();
+            sunPackageName = ModelTypeEnum.PARAM.getExt();
+        } else if (ModelTypeEnum.PAGE_REQUEST == this.type) {
+            sunPackageName = ModelTypeEnum.REQUEST.getExt();
         } else {
-            sunPackageName = this.type.getExt().toLowerCase();
+            sunPackageName = this.type.getExt();
         }
 
-        this.packageName = String.format(PACKAGE_NAME_FORMAT, basePackage, domainKey, sunPackageName).toLowerCase() + this.className;
+        this.packageName = String.format(MODEL_PACKAGE_NAME_FORMAT, basePackage.toLowerCase(), domainKey.toLowerCase(), sunPackageName.toLowerCase(), this.className);
     }
 
     /**

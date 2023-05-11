@@ -3,8 +3,10 @@ package cn.meshed.cloud.rd.project.executor.query;
 import cn.meshed.cloud.cqrs.QueryExecute;
 import cn.meshed.cloud.rd.domain.project.Model;
 import cn.meshed.cloud.rd.domain.project.gateway.ModelGateway;
+import cn.meshed.cloud.rd.project.data.EnumValueDTO;
 import cn.meshed.cloud.rd.project.data.ModelDetailDTO;
 import cn.meshed.cloud.rd.project.data.RequestFieldDTO;
+import cn.meshed.cloud.rd.project.enums.ModelTypeEnum;
 import cn.meshed.cloud.utils.CopyUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.SingleResponse;
@@ -36,7 +38,11 @@ public class ModelByUuidQryExe implements QueryExecute<String, SingleResponse<Mo
         ModelDetailDTO detailDTO = CopyUtils.copy(model, ModelDetailDTO.class);
         detailDTO.setDomain(model.getDomainKey());
         detailDTO.setKey(model.getClassName().replace(model.getType().getExt(), ""));
-        detailDTO.setFields(CopyUtils.copyListProperties(model.getFields(), RequestFieldDTO.class));
+        if (ModelTypeEnum.ENUM.equals(model.getType())) {
+            detailDTO.setEnumValues(CopyUtils.copyListProperties(model.getEnumValues(), EnumValueDTO.class));
+        } else {
+            detailDTO.setFields(CopyUtils.copyListProperties(model.getFields(), RequestFieldDTO.class));
+        }
         return ResultUtils.of(detailDTO);
     }
 }

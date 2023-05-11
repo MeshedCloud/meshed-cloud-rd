@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -47,7 +47,7 @@ public class TrendLog implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime time;
+    private Date time;
 
     public TrendLog(String projectKey, TrendLogLevelEnum level, String message) {
         this.projectKey = projectKey;
@@ -59,7 +59,7 @@ public class TrendLog implements Serializable {
                 this.message = message;
             }
         }
-        this.time = LocalDateTime.now();
+        this.time = new Date();
     }
 
     @Override

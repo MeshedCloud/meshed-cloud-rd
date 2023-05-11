@@ -1,7 +1,13 @@
 service:
-  mock:
-    enable: true
-    user-id: 1
-    username: name
-    access: 6
-    roles: 6
+  security:
+    excludeUris:
+      - /actuator
+      - /actuator/**
+      - /doc.html
+      - /v3/**
+    mock:
+      enable: true
+      user-id: 1
+      username: name
+      access: 6
+      roles: RD:ADMIN

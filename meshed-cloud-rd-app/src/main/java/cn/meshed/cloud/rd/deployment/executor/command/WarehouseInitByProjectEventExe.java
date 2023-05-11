@@ -10,7 +10,9 @@ import cn.meshed.cloud.rd.domain.log.Trend;
 import cn.meshed.cloud.rd.project.event.ProjectInitializeEvent;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
+import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ import java.util.function.Consumer;
  * @author Vincent Vic
  * @version 1.0
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class WarehouseInitByProjectEventExe implements EventExecute<ProjectInitializeEvent, Response> {
@@ -41,8 +44,8 @@ public class WarehouseInitByProjectEventExe implements EventExecute<ProjectIniti
     @Trend(key = "#{projectInitializeEvent.key}", content = "#{projectInitializeEvent.name}+项目仓库初始化")
     @Override
     public Response execute(ProjectInitializeEvent projectInitializeEvent) {
+        log.info("项目初始化【仓库初始化消费者】: {}", JSONObject.toJSONString(projectInitializeEvent));
         if (CollectionUtils.isNotEmpty(projectInitializeEvent.getCodeTemplates())) {
-            System.out.println("projectInitializeEvent");
             projectInitializeEvent.getCodeTemplates().stream().filter(Objects::nonNull)
                     //查询模板
                     .map(scaffoldTemplateQryExe::execute)

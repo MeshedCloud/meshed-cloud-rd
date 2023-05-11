@@ -9,8 +9,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <h1></h1>
@@ -84,6 +88,21 @@ public class Version implements Serializable {
             this.environments = String.valueOf(environment.getValue());
         }
 
+    }
+
+    public List<EnvironmentEnum> getEnvironmentEnums() {
+        if (StringUtils.isBlank(this.environments)) {
+            return Collections.emptyList();
+        }
+        String[] envs = this.environments.split(",");
+        return Arrays.stream(envs).filter(StringUtils::isNotBlank).map(env -> {
+            for (EnvironmentEnum environmentEnum : EnvironmentEnum.values()) {
+                if (Integer.valueOf(env).equals(environmentEnum.getValue())) {
+                    return environmentEnum;
+                }
+            }
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public void setEnvironment(String environments) {

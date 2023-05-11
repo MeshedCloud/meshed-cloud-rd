@@ -27,6 +27,6 @@ public class ProjectMemberDelCmdExe implements CommandExecute<Integer, Response>
      */
     @Override
     public Response execute(Integer id) {
-        return ResultUtils.of(projectMemberGateway.delete(id));
+        return ResultUtils.of(projectMemberGateway.delete(id), "修改失败");
     }
 }

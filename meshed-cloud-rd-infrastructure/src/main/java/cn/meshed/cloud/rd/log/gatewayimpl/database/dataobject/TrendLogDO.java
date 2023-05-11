@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -49,7 +49,7 @@ public class TrendLogDO implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime time;
+    private Date time;
 
 
 }

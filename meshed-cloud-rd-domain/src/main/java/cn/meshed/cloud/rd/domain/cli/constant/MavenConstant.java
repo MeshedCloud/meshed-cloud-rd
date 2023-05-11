@@ -41,6 +41,10 @@ public interface MavenConstant {
      * setting 命令参数
      */
     String SETTING_PARAM_FORMAT = "--settings %s";
+    /**
+     * setting 命令参数
+     */
+    String DEFAULT_SETTING_XML = "settings.xml";
 
     /**
      * 原型构建命令

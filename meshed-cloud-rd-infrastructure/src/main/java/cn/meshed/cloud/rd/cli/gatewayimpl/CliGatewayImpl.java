@@ -2,14 +2,7 @@ package cn.meshed.cloud.rd.cli.gatewayimpl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.meshed.cloud.rd.codegen.GenerateClassExecute;
-import cn.meshed.cloud.rd.domain.cli.Archetype;
-import cn.meshed.cloud.rd.domain.cli.Artifact;
-import cn.meshed.cloud.rd.domain.cli.BuildArchetype;
-import cn.meshed.cloud.rd.domain.cli.GenerateAdapter;
-import cn.meshed.cloud.rd.domain.cli.GenerateCode;
-import cn.meshed.cloud.rd.domain.cli.GenerateEnum;
-import cn.meshed.cloud.rd.domain.cli.GenerateModel;
-import cn.meshed.cloud.rd.domain.cli.GenerateRpc;
+import cn.meshed.cloud.rd.domain.cli.*;
 import cn.meshed.cloud.rd.domain.cli.gateway.CliGateway;
 import cn.meshed.cloud.rd.domain.cli.utils.GenerateUtils;
 import cn.meshed.cloud.rd.domain.repo.Branch;
@@ -20,6 +13,7 @@ import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.IdUtils;
 import com.alibaba.cola.exception.SysException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.cli.MavenCli;
@@ -37,18 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.ARCHETYPE_ARTIFACT_ID;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.ARCHETYPE_GENERATE_ARG;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.ARCHETYPE_GROUP_ID;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.ARCHETYPE_VERSION;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.ARG_FORMAT;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.ARTIFACT_ID;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.BUILD_ARG;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.GROUP_ID;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.MULTI_MODULE_PROJECT_DIRECTORY;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.PACKAGE;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.SETTING_PARAM_FORMAT;
-import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.VERSION;
+import static cn.meshed.cloud.rd.domain.cli.constant.MavenConstant.*;
 import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.WORKSPACE;
 
 /**
@@ -57,6 +40,7 @@ import static cn.meshed.cloud.rd.domain.repo.constant.RepoConstant.WORKSPACE;
  * @author Vincent Vic
  * @version 1.0
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class CliGatewayImpl implements CliGateway {
@@ -65,6 +49,8 @@ public class CliGatewayImpl implements CliGateway {
     private final GenerateClassExecute generateClassExecute;
     @Value("${rd.cli.workspace}")
     private String workspace;
+    @Value("${rd.cli.setting.url}")
+    private String settingUrl;
 
     /**
      * 原型构建
@@ -85,9 +71,6 @@ public class CliGatewayImpl implements CliGateway {
         System.getProperties().setProperty(MULTI_MODULE_PROJECT_DIRECTORY, mvnHome);
         List<String> args = new ArrayList<>();
         args.add(ARCHETYPE_GENERATE_ARG);
-        if (StringUtils.isNotBlank(archetype.getSettingPath())) {
-            args.add(String.format(SETTING_PARAM_FORMAT, archetype.getSettingPath()));
-        }
         addArg(args, ARCHETYPE_GROUP_ID, archetype.getArchetypeGroupId());
         addArg(args, ARCHETYPE_ARTIFACT_ID, archetype.getArchetypeArtifactId());
         addArg(args, ARCHETYPE_VERSION, archetype.getArchetypeVersion());
@@ -103,6 +86,7 @@ public class CliGatewayImpl implements CliGateway {
         }
         //工作目录
         String workspacePath = getWorkspacePath();
+
         int status = 0;
         try {
             status = cli.doMain(args.toArray(new String[]{}), workspacePath, System.out, System.out);

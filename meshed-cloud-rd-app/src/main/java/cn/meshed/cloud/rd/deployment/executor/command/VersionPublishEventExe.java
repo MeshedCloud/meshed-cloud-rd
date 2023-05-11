@@ -46,7 +46,7 @@ public class VersionPublishEventExe implements EventExecute<VersionPublishEvent,
     @Transactional
     @Override
     public Response execute(VersionPublishEvent versionPublishEvent) {
-        log.info("版本发布事件 {}", JSONObject.toJSONString(versionPublishEvent));
+        log.info("版本发布事件: {}", JSONObject.toJSONString(versionPublishEvent));
         Version version = versionGateway.query(versionPublishEvent.getVersionId());
         AssertUtils.isTrue(version != null, "版本不存在拒绝执行");
         Publish publish = CopyUtils.copy(versionPublishEvent, Publish.class);
