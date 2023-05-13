@@ -1,10 +1,13 @@
 package cn.meshed.cloud.rd.project.executor.command;
 
 import cn.meshed.cloud.cqrs.CommandExecute;
+import cn.meshed.cloud.rd.domain.deployment.VersionOccupy;
+import cn.meshed.cloud.rd.domain.deployment.VersionOccupyGateway;
 import cn.meshed.cloud.rd.domain.project.Service;
 import cn.meshed.cloud.rd.domain.project.gateway.ServiceGateway;
 import cn.meshed.cloud.rd.project.command.ServiceStatusCmd;
 import cn.meshed.cloud.rd.project.enums.ReleaseStatusEnum;
+import cn.meshed.cloud.rd.project.enums.ServiceModelTypeEnum;
 import cn.meshed.cloud.utils.AssertUtils;
 import cn.meshed.cloud.utils.ResultUtils;
 import com.alibaba.cola.dto.Response;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServiceStatusCmdExe implements CommandExecute<ServiceStatusCmd, Response> {
 
     private final ServiceGateway serviceGateway;
+    private final VersionOccupyGateway versionOccupyGateway;
 
     /**
      * @param serviceStatusCmd
@@ -34,6 +38,8 @@ public class ServiceStatusCmdExe implements CommandExecute<ServiceStatusCmd, Res
         Service service = serviceGateway.query(serviceStatusCmd.getUuid());
         AssertUtils.isTrue(service != null, "服务不存在");
         assert service != null;
+        VersionOccupy occupy = versionOccupyGateway.query(ServiceModelTypeEnum.SERVICE, service.getUuid());
+        AssertUtils.isTrue(occupy == null, "模型正在处理中无法操作");
         //完成必须从编辑状态转换过来
         if (ReleaseStatusEnum.PROCESSING.equals(serviceStatusCmd.getReleaseStatus())) {
             AssertUtils.isTrue(service.getReleaseStatus() == ReleaseStatusEnum.EDIT, "服务当前并非编辑状态，无法修改为完成");

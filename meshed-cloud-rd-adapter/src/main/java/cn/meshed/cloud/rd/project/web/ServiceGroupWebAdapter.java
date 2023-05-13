@@ -40,6 +40,17 @@ public class ServiceGroupWebAdapter implements ServiceGroupAdapter {
     }
 
     /**
+     * 服务分组查询信息
+     *
+     * @param uuid uuid
+     * @return {@link SingleResponse< List <ServiceGroupDTO>>}
+     */
+    @Override
+    public SingleResponse<ServiceGroupDTO> query(String uuid) {
+        return serviceGroupAbility.query(uuid);
+    }
+
+    /**
      * 保存功能
      *
      * @param serviceGroupCmd 服务分组数据

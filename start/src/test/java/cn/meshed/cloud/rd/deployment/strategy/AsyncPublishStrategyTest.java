@@ -30,8 +30,9 @@ public class AsyncPublishStrategyTest {
     public void asyncPublish() {
 
         Publish publish = new Publish();
-        publish.setProjectKey("PROPERTY");
-        publish.setSourceId("3243305");
+        publish.setVersionId(16L);
+        publish.setProjectKey("PLATFORM");
+        publish.setSourceId("3380806");
         publish.setMessage("生成客户端接口合模型");
         asyncPublishStrategy.asyncPublish(PublishType.CLIENT, publish);
 

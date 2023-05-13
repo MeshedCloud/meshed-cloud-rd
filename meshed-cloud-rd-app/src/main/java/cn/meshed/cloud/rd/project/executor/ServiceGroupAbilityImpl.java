@@ -2,10 +2,12 @@ package cn.meshed.cloud.rd.project.executor;
 
 import cn.meshed.cloud.rd.domain.project.ability.ServiceGroupAbility;
 import cn.meshed.cloud.rd.project.command.ServiceGroupCmd;
+import cn.meshed.cloud.rd.project.data.ServiceGroupDTO;
 import cn.meshed.cloud.rd.project.data.ServiceGroupSelectDTO;
 import cn.meshed.cloud.rd.project.executor.command.ServiceGroupCmdExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceGroupAvailableClassQryExe;
 import cn.meshed.cloud.rd.project.executor.query.ServiceGroupBySelectQryExe;
+import cn.meshed.cloud.rd.project.executor.query.ServiceGroupByUuidQryExe;
 import cn.meshed.cloud.rd.project.query.ServiceAvailableClassQry;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.dto.SingleResponse;
@@ -27,6 +29,7 @@ public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
     private final ServiceGroupCmdExe serviceGroupCmdExe;
     private final ServiceGroupAvailableClassQryExe serviceGroupAvailableClassQryExe;
     private final ServiceGroupBySelectQryExe serviceGroupBySelectQryExe;
+    private final ServiceGroupByUuidQryExe serviceGroupByUuidQryExe;
 
     /**
      * 服务分组选择获取
@@ -59,5 +62,16 @@ public class ServiceGroupAbilityImpl implements ServiceGroupAbility {
     @Override
     public Response availableClassName(ServiceAvailableClassQry serviceAvailableClassQry) {
         return serviceGroupAvailableClassQryExe.execute(serviceAvailableClassQry);
+    }
+
+    /**
+     * <h2>查询</h2>
+     *
+     * @param uuid uuid
+     * @return {@link SingleResponse<ServiceGroupDTO>}
+     */
+    @Override
+    public SingleResponse<ServiceGroupDTO> query(String uuid) {
+        return serviceGroupByUuidQryExe.execute(uuid);
     }
 }
