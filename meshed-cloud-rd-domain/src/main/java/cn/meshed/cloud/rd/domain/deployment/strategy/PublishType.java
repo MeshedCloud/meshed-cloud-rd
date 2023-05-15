@@ -44,5 +44,9 @@ public enum PublishType {
      * RPC (粒子维度)
      */
     RPC,
+    /**
+     * RELEASE (子维度)
+     */
+    RELEASE,
 
 }

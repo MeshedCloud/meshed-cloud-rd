@@ -151,6 +151,8 @@ public class Model implements Serializable {
             sunPackageName = ModelTypeEnum.PARAM.getExt();
         } else if (ModelTypeEnum.PAGE_REQUEST == this.type) {
             sunPackageName = ModelTypeEnum.REQUEST.getExt();
+        } else if (ModelTypeEnum.ENUM == this.type) {
+            sunPackageName = ModelTypeEnum.ENUM.getExt() + "s";
         } else {
             sunPackageName = this.type.getExt();
         }

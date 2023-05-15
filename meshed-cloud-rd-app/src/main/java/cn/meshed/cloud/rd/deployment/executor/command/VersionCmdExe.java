@@ -71,10 +71,14 @@ public class VersionCmdExe implements CommandExecute<VersionCmd, Response> {
         AssertUtils.isTrue(project != null, "项目不存在");
         AssertUtils.isTrue(project.getStatus() != ProjectStatusEnum.APPLY, "项目未被批准");
 
-        Response response = waitPublishLegalQryExe.execute(versionCmd.getProjectKey());
-        if (!response.isSuccess()) {
-            return response;
+        //非发行版校验
+        if (!EnvironmentEnum.RELEASE.equals(versionCmd.getEnvironment())) {
+            Response response = waitPublishLegalQryExe.execute(versionCmd.getProjectKey());
+            if (!response.isSuccess()) {
+                return response;
+            }
         }
+
         Version version = null;
         //区分新建和版本发布（含不同环境）
         if (versionCmd.getVersionId() == null) {

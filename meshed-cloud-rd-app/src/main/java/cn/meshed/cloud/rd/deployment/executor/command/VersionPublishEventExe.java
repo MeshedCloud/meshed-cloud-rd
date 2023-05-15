@@ -62,6 +62,8 @@ public class VersionPublishEventExe implements EventExecute<VersionPublishEvent,
     private PublishType getPublishType(PublishTypeEnum publishType, EnvironmentEnum environment) {
         if (publishType == PublishTypeEnum.CLIENT && environment == EnvironmentEnum.SNAPSHOT) {
             return PublishType.CLIENT;
+        } else if (publishType == PublishTypeEnum.CLIENT && environment == EnvironmentEnum.RELEASE) {
+            return PublishType.RELEASE;
         }
         throw new SysException("其他发布暂未实现");
     }

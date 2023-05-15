@@ -52,6 +52,7 @@ public class WaitPublishLegalQryExe implements QueryExecute<String, Response> {
             Set<Service> services = serviceGateway.listByGroupIds(groupIds);
             if (CollectionUtils.isNotEmpty(services)) {
                 Set<String> set = services.stream()
+                        .filter(Objects::nonNull)
                         .map(this::toField)
                         .flatMap(Collection::stream)
                         .map(Field::getFieldType).collect(Collectors.toSet());
@@ -67,8 +68,12 @@ public class WaitPublishLegalQryExe implements QueryExecute<String, Response> {
 
     private List<Field> toField(Service service) {
         List<Field> fields = new ArrayList<>();
-        fields.addAll(service.getRequests());
-        fields.addAll(service.getResponses());
+        if (CollectionUtils.isNotEmpty(service.getRequests())) {
+            fields.addAll(service.getRequests());
+        }
+        if (CollectionUtils.isNotEmpty(service.getResponses())) {
+            fields.addAll(service.getResponses());
+        }
         return fields;
     }
 }
